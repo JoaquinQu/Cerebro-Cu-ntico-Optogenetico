@@ -1,21 +1,106 @@
 # Cerebro Cuántico Optogenético
 
-Visualización 3D del conectoma de *C. elegans*. Un "láser optogenético" ilumina una neurona y una **quantum walk** propaga la actividad por la red. Además, un microcircuito del reflejo de toque corre en hardware cuántico real de IBM.
+Visualización 3D del conectoma real de *C. elegans* (302 neuronas). Un "láser optogenético" ilumina una neurona y un **quantum walk** propaga la excitación por las sinapsis reales del gusano. Un microcircuito del reflejo de toque se compila a compuertas nativas de **IonQ Forte** para correr en hardware cuántico real.
 
 ![Vista previa](preview_cuantico.gif)
 
-*Vista previa ilustrativa con una red sintética de 302 neuronas.*
+*Vista previa ilustrativa con una red sintética de 302 neuronas. El prototipo ya usa el conectoma real.*
 
-La idea completa, con diagramas, está en `Cerebro Cuántico Optogenético.docx`.
+| Documento | Contenido |
+| --- | --- |
+| [`docs/TEORIA.md`](docs/TEORIA.md) | Física y fundamento de cada decisión del backend (modelo XY, láser como rotación de Rabi, Trotter, compilación a IonQ, errores, referencias) |
+| [`docs/ARQUITECTURA.md`](docs/ARQUITECTURA.md) | Carpetas, módulos, API y flujo de datos |
+| `Cerebro Cuántico Optogenético.docx` | La idea original, con diagramas |
+
+---
+
+## Prototipo: cómo correrlo
+
+Requisitos: Python 3.10 o superior. El frontend no necesita instalación porque three.js ya viene incluido en `frontend/vendor/`, así que funciona sin internet.
+
+```bash
+# 1. Entorno e instalación (Windows: .venv\Scripts\activate)
+python -m venv .venv
+source .venv/bin/activate
+pip install -r backend/requirements.txt
+
+# 2. Arrancar (sirve la API y la interfaz)
+cd backend
+python run.py
+# → abrir http://127.0.0.1:8000
+```
+
+### Conectar IonQ
+
+1. Copia `backend/.env.example` como `backend/.env` y pega tu `IONQ_API_KEY` (cloud.ionq.com → API Keys).
+2. Prueba sin costo en el simulador de IonQ con el modelo de ruido de Forte:
+
+   ```bash
+   cd backend
+   python scripts/run_ionq_experiment.py --dry-run                 # recursos y circuito, sin enviar
+   python scripts/run_ionq_experiment.py --backend simulator --noise forte-1
+   ```
+
+3. Hardware real: pon `ALLOW_QPU=true` en `.env` y ejecuta:
+
+   ```bash
+   python scripts/run_ionq_experiment.py --backend qpu.forte-1 --times 10 20 30 40 --shots 500
+   ```
+
+   Las corridas en QPU tienen costo. El script pide confirmación antes de enviar.
+
+Los resultados quedan en `backend/data/results/jobs/` y la interfaz los muestra junto a la teoría.
+
+### Tests
+
+```bash
+cd backend
+python -m unittest discover -s tests      # 25 pruebas: física, compilación, Trotter, flujo IonQ
+python scripts/resource_report.py         # presupuesto de compuertas para IonQ Forte
+```
+
+### Qué hace hoy el prototipo
+
+![Captura del prototipo](docs/captura_prototipo.png)
+
+- **Red completa (302 neuronas):** quantum walk exacto. Haz clic en cualquier neurona para dispararle el láser y ver la propagación en 3D.
+- **Microcircuito de toque (6, 7, 10 o 14 neuronas):**
+  - Teoría exacta, circuito de Trotter y simulación local con ruido tipo Forte, con post-selección.
+  - Circuito compilado a `gpi`/`gpi2`/`zz` nativas, verificado matriz por matriz.
+  - Envío a IonQ desde la interfaz o por script.
+- **Exportación:** JSON listo para la API de IonQ y OpenQASM 2.0 (para Qiskit o Braket).
+
+### Estructura del repositorio
+
+```
+├── backend/
+│   ├── cerebro/              # paquete principal
+│   │   ├── connectome.py     # datos reales → matriz J hermítica
+│   │   ├── hamiltonian.py    # modelo XY / quantum walk exacto
+│   │   ├── circuits/         # IR, simulador, Trotter/Givens, compilación a IonQ
+│   │   ├── ionq/             # cliente REST v0.4 + registro de experimentos
+│   │   ├── analysis.py       # post-selección y métricas
+│   │   ├── microcircuits.py  # circuitos de toque predefinidos
+│   │   ├── pipeline.py       # servicios que usa la API
+│   │   └── api/              # servidor HTTP (Starlette)
+│   ├── data/                 # conectoma (Cook 2019) y posiciones (OpenWorm)
+│   ├── scripts/              # experimento IonQ y reporte de recursos
+│   ├── tests/                # pruebas + IonQ simulado
+│   └── run.py
+├── frontend/                 # interfaz three.js (sin build)
+└── docs/                     # TEORIA.md, ARQUITECTURA.md
+```
 
 ---
 
 ## Metodología de trabajo: 4 personas, viernes a domingo
 
+> El prototipo inicial ya cubre el esqueleto de cada rol. El fin de semana se usa para entender, validar en IonQ, pulir y presentar.
+
 ### Principios
 
-1. **Primero el MVP.** El MVP es la quantum walk sobre el conectoma, con un gusano 3D y clic para iluminar. Nada se agrega encima hasta que eso funcione de punta a punta.
-2. **Integrar temprano y seguido.** Cada pieza se conecta con las demás desde el viernes, aunque sea con datos falsos.
+1. **Primero el MVP.** El MVP es el quantum walk sobre el conectoma, con un gusano 3D y clic para iluminar. Nada se agrega encima hasta que eso funcione de punta a punta.
+2. **Integrar temprano y seguido.** Cada pieza se conecta con las demás desde el viernes.
 3. **Siempre hay algo que mostrar.** Al cierre de cada día, `main` tiene una demo que funciona.
 4. **Timeboxes estrictos.** Si algo se traba más de 45 minutos, se pide ayuda o se cambia de enfoque.
 
@@ -23,58 +108,47 @@ La idea completa, con diagramas, está en `Cerebro Cuántico Optogenético.docx`
 
 Cada rol tiene dueño, pero todos pueden ayudar en los demás.
 
-| Persona | Rol | Es dueña de | Entregable mínimo |
+| Persona | Rol | Es dueña de | Punto de partida en el prototipo |
 | --- | --- | --- | --- |
-| **P1** | Física / quantum walk | Cargar el conectoma, armar la matriz A, calcular P_k(t) = \|⟨k\|e^{-iγAt}\|j⟩\|² | Función `probabilidades(neurona, t)` → arreglo de 302 valores |
-| **P2** | Circuito y hardware | Microcircuito del reflejo de toque en Qiskit: pulso → RX(θ), sinapsis → CRY(φ). Correrlo en IBM | Histograma de patrones de disparo guardado en JSON |
-| **P3** | Frontend 3D | Escena en three.js: gusano, neuronas, clic-láser, sliders, animación | Escena que anima un arreglo de 302 brillos |
-| **P4** | Integración y presentación | Backend FastAPI que une P1 y P2 con P3. Repositorio, narrativa, slides y video de respaldo | API funcionando y demo ensayada |
+| **P1** | Física / quantum walk | Conectoma, matriz J, P_k(t) = sin²(θ/2)\|⟨k\|e^{-iγJt}\|j⟩\|² | `connectome.py`, `hamiltonian.py`, `docs/TEORIA.md` §2–§5 |
+| **P2** | Circuito y hardware IonQ | Microcircuito de toque, Trotter/Givens, compilación nativa, corridas en IonQ | `circuits/`, `ionq/`, `scripts/run_ionq_experiment.py` |
+| **P3** | Frontend 3D | Gusano, clic-láser, animación, panel de IonQ | `frontend/js/scene.js`, `main.js`, `charts.js` |
+| **P4** | Integración y presentación | API, repositorio, narrativa, slides y video de respaldo | `api/app.py`, `pipeline.py`, README |
 
 P4 también hace de *facilitador*: lleva el tiempo, corre los check-ins y decide cuándo se congela el código.
 
-### Contrato entre piezas (definir el viernes en la primera hora)
+### Contrato entre piezas (ya implementado)
 
 ```
-GET  /conectoma            -> { "neuronas": [{id, nombre, x, y, z}], "aristas": [[i, j, peso]] }
-POST /quantum-walk         <- { "neurona": j, "theta": θ, "t_max": T, "pasos": N }
-                           -> { "tiempos": [...], "prob": [[302 valores], ...] }
-GET  /microcircuito        -> { "neuronas": [ids], "shots": {"0101": 312, ...}, "backend": "ibm_..." }
-```
-
-Con este contrato fijo, P3 puede trabajar con datos falsos desde la primera hora sin esperar a P1 ni a P2.
-
-### Estructura del repositorio
-
-```
-cerebro-cuantico/
-├── backend/        # FastAPI (P4)
-├── fisica/         # quantum walk, carga del conectoma (P1)
-├── circuito/       # Qiskit + resultados de IBM en JSON (P2)
-├── frontend/       # three.js (P3)
-├── datos/          # conectoma limpio (CSV/JSON)
-└── presentacion/   # slides, video de respaldo, guion (P4)
+GET  /api/connectome                 -> { neurons: [{name, x, y, z, type, degree}], edges: [[i, j, J_ij]] }
+POST /api/walk                       <- { source, theta, gamma, t_max, frames }
+                                     -> { times: [...], prob: [[302 valores], ...], participation: [...] }
+POST /api/microcircuit/simulate      <- { preset, sources, theta, t, mode: "trotter"|"givens" }
+                                     -> { exact, circuit_ideal, noisy_local, resources, circuit: {ionq_native, ...} }
+POST /api/ionq/submit                <- lo anterior + { backend, noise_model, shots }
+GET  /api/ionq/jobs/{id}             -> estado y análisis (post-selección, TVD)
 ```
 
 ---
 
 ## Plan por día
 
-### Viernes: base y esqueleto conectado
+### Viernes: entender el prototipo y validarlo en IonQ
 
 | Bloque | Qué se hace | Quién |
 | --- | --- | --- |
-| Kickoff (1 h) | Leer la idea juntos, confirmar roles, escribir el contrato de la API, crear el repo | Todos |
-| Bloque 1 (3 h) | P1: descargar y limpiar el conectoma (OpenWorm / WormWiring), simetrizar A · P2: microcircuito en simulador · P3: gusano 3D con datos falsos · P4: esqueleto FastAPI con endpoints de mentira | Cada uno en lo suyo |
+| Kickoff (1 h) | Correr el prototipo en cada computador, leer juntos `docs/TEORIA.md` §1 y §3–§4, confirmar roles | Todos |
+| Bloque 1 (3 h) | P1: revisar la construcción de J y probar otros pesos (`binary`, `count`) · P2: `--dry-run` y primera corrida en el simulador de IonQ con ruido `forte-1` · P3: recorrer la interfaz y anotar mejoras visuales · P4: tablero de tareas y guion preliminar | Cada uno en lo suyo |
 | Check-in (15 min) | ¿Qué funciona? ¿Qué bloquea? | Todos |
-| Bloque 2 (3 h) | P1: quantum walk real expuesta en la API · P3: conectar la escena a la API · P2: primera corrida en IBM (la cola puede tardar) · P4: integrar y ayudar donde haya bloqueo | Cada uno en lo suyo |
-| Cierre (30 min) | **Hito 1:** clic en una neurona → el gusano se ilumina con datos reales de la quantum walk | Todos |
+| Bloque 2 (3 h) | P1: elegir el tiempo t y la neurona fuente que mejor cuentan la historia · P2: enviar el experimento a la QPU Forte (la cola puede tardar) · P3: pulir la animación del láser y la cámara · P4: integrar y ayudar donde haya bloqueo | Cada uno en lo suyo |
+| Cierre (30 min) | **Hito 1:** resultados del simulador de IonQ visibles en la interfaz junto a la teoría | Todos |
 
 ### Sábado: MVP sólido y el hardware real
 
 | Bloque | Qué se hace | Quién |
 | --- | --- | --- |
 | Stand-up (15 min) | Revisar el hito 1 y priorizar el día | Todos |
-| Bloque 1 (3,5 h) | P1: ajustar γ y t para que la propagación se vea bien, y mapear θ → estado inicial · P3: glow, colores, cámara, slider de intensidad · P2: resultados de IBM en JSON, conectados a la API · P4: guion de la demo | Cada uno en lo suyo |
+| Bloque 1 (3,5 h) | P1: ajustar γ y t para que la propagación se vea bien, y mapear θ → estado inicial · P3: glow, colores, cámara, slider de intensidad · P2: resultados de IonQ en JSON, conectados a la API · P4: guion de la demo | Cada uno en lo suyo |
 | Check-in (15 min) | Probar la demo completa una vez | Todos |
 | Bloque 2 (3,5 h) | P3 + P2: animar las ráfagas de spikes del microcircuito sobre el gusano · P1: sección de física para las slides · P4: slides y grabar un video de respaldo preliminar | Pares |
 | Cierre (30 min) | **Hito 2:** demo completa de punta a punta. **Congelar funcionalidades:** desde aquí no se agrega nada nuevo | Todos |
@@ -98,7 +172,7 @@ cerebro-cuantico/
 - **Check-ins cortos (15 min)** tras cada bloque: qué hice, qué sigue y qué me bloquea.
 - **Git:** una rama por persona (`fisica`, `circuito`, `frontend`, `backend`), merge a `main` al menos dos veces al día y siempre antes del cierre. Nada roto en `main`.
 - **Tablero de tareas:** tres columnas (Por hacer, En curso, Listo) en el canal del grupo o en un tablero compartido. Cada tarea tiene un dueño.
-- **Plan B siempre listo:** resultados de IBM precalculados, un video de la demo y la escena capaz de funcionar sin backend con datos guardados.
+- **Plan B siempre listo:** resultados de IonQ precalculados, un video de la demo y la escena capaz de funcionar sin backend con datos guardados.
 - **Descansos:** comer lejos del computador. Un equipo cansado introduce bugs el domingo.
 
 ## Definición de "listo"

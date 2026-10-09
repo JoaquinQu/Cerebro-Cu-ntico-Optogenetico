@@ -1,0 +1,11 @@
+# Núcleo científico
+numpy>=1.26
+scipy>=1.11
+# Servidor
+starlette>=0.37
+uvicorn>=0.29
+pydantic>=2.5
+# Cliente de IonQ (API REST v0.4)
+requests>=2.31
+# Opcional: correr los tests con pytest (también funcionan con python -m unittest)
+# pytest>=8

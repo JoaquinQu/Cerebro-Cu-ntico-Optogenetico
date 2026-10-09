@@ -1,0 +1,14 @@
+# Secretos
+backend/.env
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+.pytest_cache/
+# Resultados locales de IonQ (súbanlos sólo si quieren compartirlos)
+backend/data/results/jobs/*.json
+# Sistema
+.DS_Store
+Thumbs.db
+desktop.ini

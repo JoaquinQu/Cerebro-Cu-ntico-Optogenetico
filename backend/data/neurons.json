@@ -1,0 +1,3598 @@
+[
+ {
+  "name": "I2L",
+  "x": 1.55,
+  "y": -311.65,
+  "z": 54.45,
+  "types": [
+   "interneuron",
+   "sensory"
+  ],
+  "neurotransmitters": [
+   "Glutamate"
+  ]
+ },
+ {
+  "name": "I2R",
+  "x": -5.7999997,
+  "y": -311.65,
+  "z": 54.45,
+  "types": [
+   "interneuron",
+   "sensory"
+  ],
+  "neurotransmitters": []
+ },
+ {
+  "name": "I1L",
+  "x": 2.8999999,
+  "y": -300.35,
+  "z": 53.149998,
+  "types": [
+   "interneuron",
+   "sensory"
+  ],
+  "neurotransmitters": [
+   "Acetylcholine"
+  ]
+ },
+ {
+  "name": "I1R",
+  "x": -7.1500006,
+  "y": -300.35,
+  "z": 53.149998,
+  "types": [
+   "interneuron",
+   "sensory"
+  ],
+  "neurotransmitters": [
+   "Acetylcholine"
+  ]
+ },
+ {
+  "name": "I3",
+  "x": -2.05,
+  "y": -296.55002,
+  "z": 58.25,
+  "types": [
+   "interneuron",
+   "sensory"
+  ],
+  "neurotransmitters": []
+ },
+ {
+  "name": "MCL",
+  "x": 3.2,
+  "y": -296.15,
+  "z": 52.3,
+  "types": [
+   "motor",
+   "sensory"
+  ],
+  "neurotransmitters": [
+   "Acetylcholine"
+  ]
+ },
+ {
+  "name": "MCR",
+  "x": -7.25,
+  "y": -296.15,
+  "z": 52.3,
+  "types": [
+   "motor",
+   "sensory"
+  ],
+  "neurotransmitters": [
+   "Acetylcholine"
+  ]
+ },
+ {
+  "name": "M3L",
+  "x": 3.7500002,
+  "y": -295.4,
+  "z": 48.15,
+  "types": [
+   "motor",
+   "sensory"
+  ],
+  "neurotransmitters": [
+   "Glutamate"
+  ]
+ },
+ {
+  "name": "M3R",
+  "x": -8.05,
+  "y": -295.4,
+  "z": 48.15,
+  "types": [
+   "motor",
+   "sensory"
+  ],
+  "neurotransmitters": [
+   "Glutamate"
+  ]
+ },
+ {
+  "name": "MI",
+  "x": -2.1539998,
+  "y": -293.51202,
+  "z": 56.707,
+  "types": [
+   "interneuron",
+   "motor"
+  ],
+  "neurotransmitters": [
+   "Glutamate"
+  ]
+ },
+ {
+  "name": "NSML",
+  "x": 2.6000001,
+  "y": -292.25,
+  "z": 51.8,
+  "types": [
+   "motor",
+   "sensory"
+  ],
+  "neurotransmitters": [
+   "Serotonin"
+  ]
+ },
+ {
+  "name": "NSMR",
+  "x": -6.3500004,
+  "y": -292.25,
+  "z": 51.8,
+  "types": [
+   "motor",
+   "sensory"
+  ],
+  "neurotransmitters": [
+   "Serotonin"
+  ]
+ },
+ {
+  "name": "M4",
+  "x": -2.033,
+  "y": -288.93298,
+  "z": 57.583,
+  "types": [
+   "motor"
+  ],
+  "neurotransmitters": [
+   "Acetylcholine"
+  ]
+ },
+ {
+  "name": "IL2VL",
+  "x": 3.3,
+  "y": -288.875,
+  "z": 42.95,
+  "types": [
+   "sensory"
+  ],
+  "neurotransmitters": [
+   "Acetylcholine"
+  ]
+ },
+ {
+  "name": "IL2VR",
+  "x": -7.6,
+  "y": -288.875,
+  "z": 42.95,
+  "types": [
+   "sensory"
+  ],
+  "neurotransmitters": [
+   "Acetylcholine"
+  ]
+ },
+ {
+  "name": "IL2DL",
+  "x": 7.1000004,
+  "y": -287.47498,
+  "z": 57.125004,
+  "types": [
+   "sensory"
+  ],
+  "neurotransmitters": [
+   "Acetylcholine"
+  ]
+ },
+ {
+  "name": "IL2DR",
+  "x": -11.35,
+  "y": -287.47498,
+  "z": 57.125004,
+  "types": [
+   "sensory"
+  ],
+  "neurotransmitters": [
+   "Acetylcholine"
+  ]
+ },
+ {
+  "name": "IL2L",
+  "x": 6.7500005,
+  "y": -285.0,
+  "z": 49.35,
+  "types": [
+   "sensory"
+  ],
+  "neurotransmitters": [
+   "Acetylcholine"
+  ]
+ },
+ {
+  "name": "IL2R",
+  "x": -11.0,
+  "y": -285.0,
+  "z": 49.35,
+  "types": [
+   "sensory"
+  ],
+  "neurotransmitters": [
+   "Acetylcholine"
+  ]
+ },
+ {
+  "name": "URADL",
+  "x": 5.0,
+  "y": -284.65,
+  "z": 52.2,
+  "types": [
+   "motor",
+   "sensory"
+  ],
+  "neurotransmitters": [
+   "Acetylcholine"
+  ]
+ },
+ {
+  "name": "URADR",
+  "x": -9.3,
+  "y": -284.65,
+  "z": 52.2,
+  "types": [
+   "motor",
+   "sensory"
+  ],
+  "neurotransmitters": [
+   "Acetylcholine"
+  ]
+ },
+ {
+  "name": "OLLL",
+  "x": 4.4,
+  "y": -283.9,
+  "z": 50.024998,
+  "types": [
+   "sensory"
+  ],
+  "neurotransmitters": [
+   "Glutamate"
+  ]
+ },
+ {
+  "name": "OLLR",
+  "x": -8.65,
+  "y": -283.9,
+  "z": 50.024998,
+  "types": [
+   "sensory"
+  ],
+  "neurotransmitters": [
+   "Glutamate"
+  ]
+ },
+ {
+  "name": "IL1DL",
+  "x": 2.825,
+  "y": -282.763,
+  "z": 52.762997,
+  "types": [
+   "interneuron",
+   "motor",
+   "sensory"
+  ],
+  "neurotransmitters": [
+   "Glutamate"
+  ]
+ },
+ {
+  "name": "IL1DR",
+  "x": -7.0620003,
+  "y": -282.763,
+  "z": 52.762997,
+  "types": [
+   "interneuron",
+   "motor",
+   "sensory"
+  ],
+  "neurotransmitters": [
+   "Glutamate"
+  ]
+ },
+ {
+  "name": "IL1L",
+  "x": 3.8,
+  "y": -282.67502,
+  "z": 47.850002,
+  "types": [
+   "interneuron",
+   "motor",
+   "sensory"
+  ],
+  "neurotransmitters": [
+   "Glutamate"
+  ]
+ },
+ {
+  "name": "IL1R",
+  "x": -8.075001,
+  "y": -282.67502,
+  "z": 47.850002,
+  "types": [
+   "interneuron",
+   "motor",
+   "sensory"
+  ],
+  "neurotransmitters": [
+   "Glutamate"
+  ]
+ },
+ {
+  "name": "URYDL",
+  "x": 4.125,
+  "y": -281.425,
+  "z": 51.899998,
+  "types": [
+   "sensory"
+  ],
+  "neurotransmitters": [
+   "Glutamate"
+  ]
+ },
+ {
+  "name": "URYDR",
+  "x": -8.4,
+  "y": -281.425,
+  "z": 51.899998,
+  "types": [
+   "sensory"
+  ],
+  "neurotransmitters": [
+   "Glutamate"
+  ]
+ },
+ {
+  "name": "URYVL",
+  "x": 3.4,
+  "y": -280.92502,
+  "z": 45.35,
+  "types": [
+   "sensory"
+  ],
+  "neurotransmitters": [
+   "Glutamate"
+  ]
+ },
+ {
+  "name": "URYVR",
+  "x": -7.7,
+  "y": -280.92502,
+  "z": 45.35,
+  "types": [
+   "sensory"
+  ],
+  "neurotransmitters": [
+   "Glutamate"
+  ]
+ },
+ {
+  "name": "OLQDL",
+  "x": 2.775,
+  "y": -280.0,
+  "z": 53.425003,
+  "types": [
+   "interneuron",
+   "sensory"
+  ],
+  "neurotransmitters": [
+   "Glutamate"
+  ]
+ },
+ {
+  "name": "OLQDR",
+  "x": -7.0249996,
+  "y": -280.0,
+  "z": 53.425003,
+  "types": [
+   "interneuron",
+   "sensory"
+  ],
+  "neurotransmitters": [
+   "Glutamate"
+  ]
+ },
+ {
+  "name": "URBL",
+  "x": 5.05,
+  "y": -279.95,
+  "z": 47.55,
+  "types": [
+   "interneuron"
+  ],
+  "neurotransmitters": [
+   "Acetylcholine"
+  ]
+ },
+ {
+  "name": "URBR",
+  "x": -9.325,
+  "y": -279.95,
+  "z": 47.55,
+  "types": [
+   "interneuron"
+  ],
+  "neurotransmitters": [
+   "Acetylcholine"
+  ]
+ },
+ {
+  "name": "URAVL",
+  "x": 0.32500002,
+  "y": -279.6,
+  "z": 41.4,
+  "types": [
+   "motor",
+   "sensory"
+  ],
+  "neurotransmitters": [
+   "Acetylcholine"
+  ]
+ },
+ {
+  "name": "URAVR",
+  "x": -4.575,
+  "y": -279.6,
+  "z": 41.4,
+  "types": [
+   "motor",
+   "sensory"
+  ],
+  "neurotransmitters": [
+   "Acetylcholine"
+  ]
+ },
+ {
+  "name": "IL1VL",
+  "x": 2.25,
+  "y": -279.5,
+  "z": 41.0,
+  "types": [
+   "interneuron",
+   "motor",
+   "sensory"
+  ],
+  "neurotransmitters": [
+   "Glutamate"
+  ]
+ },
+ {
+  "name": "IL1VR",
+  "x": -6.5499997,
+  "y": -279.5,
+  "z": 41.0,
+  "types": [
+   "interneuron",
+   "motor",
+   "sensory"
+  ],
+  "neurotransmitters": [
+   "Glutamate"
+  ]
+ },
+ {
+  "name": "OLQVL",
+  "x": 4.2,
+  "y": -279.25,
+  "z": 43.925,
+  "types": [
+   "interneuron",
+   "sensory"
+  ],
+  "neurotransmitters": [
+   "Glutamate"
+  ]
+ },
+ {
+  "name": "OLQVR",
+  "x": -8.474999,
+  "y": -279.25,
+  "z": 43.925,
+  "types": [
+   "interneuron",
+   "sensory"
+  ],
+  "neurotransmitters": [
+   "Glutamate"
+  ]
+ },
+ {
+  "name": "RIPL",
+  "x": 3.3750002,
+  "y": -278.57498,
+  "z": 48.824997,
+  "types": [
+   "interneuron"
+  ],
+  "neurotransmitters": []
+ },
+ {
+  "name": "RIPR",
+  "x": -7.625,
+  "y": -278.57498,
+  "z": 48.824997,
+  "types": [
+   "interneuron"
+  ],
+  "neurotransmitters": []
+ },
+ {
+  "name": "CEPVL",
+  "x": 0.70000005,
+  "y": -277.125,
+  "z": 39.925,
+  "types": [
+   "sensory"
+  ],
+  "neurotransmitters": [
+   "Dopamine"
+  ]
+ },
+ {
+  "name": "CEPVR",
+  "x": -4.95,
+  "y": -277.125,
+  "z": 39.925,
+  "types": [
+   "sensory"
+  ],
+  "neurotransmitters": [
+   "Dopamine"
+  ]
+ },
+ {
+  "name": "BAGL",
+  "x": 4.675,
+  "y": -277.09998,
+  "z": 44.975002,
+  "types": [
+   "sensory"
+  ],
+  "neurotransmitters": [
+   "Glutamate"
+  ]
+ },
+ {
+  "name": "BAGR",
+  "x": -9.0,
+  "y": -277.09998,
+  "z": 44.975002,
+  "types": [
+   "sensory"
+  ],
+  "neurotransmitters": [
+   "Glutamate"
+  ]
+ },
+ {
+  "name": "RMED",
+  "x": -1.5,
+  "y": -275.75,
+  "z": 58.499996,
+  "types": [
+   "motor"
+  ],
+  "neurotransmitters": [
+   "GABA"
+  ]
+ },
+ {
+  "name": "CEPDL",
+  "x": 1.35,
+  "y": -275.02502,
+  "z": 54.075005,
+  "types": [
+   "sensory"
+  ],
+  "neurotransmitters": [
+   "Dopamine"
+  ]
+ },
+ {
+  "name": "CEPDR",
+  "x": -5.625,
+  "y": -275.02502,
+  "z": 54.075005,
+  "types": [
+   "sensory"
+  ],
+  "neurotransmitters": [
+   "Dopamine"
+  ]
+ },
+ {
+  "name": "RMEL",
+  "x": 4.65,
+  "y": -274.4,
+  "z": 46.987,
+  "types": [
+   "motor"
+  ],
+  "neurotransmitters": [
+   "GABA"
+  ]
+ },
+ {
+  "name": "RMER",
+  "x": -8.900001,
+  "y": -274.4,
+  "z": 46.987,
+  "types": [
+   "motor"
+  ],
+  "neurotransmitters": [
+   "GABA"
+  ]
+ },
+ {
+  "name": "RMEV",
+  "x": -2.033,
+  "y": -272.967,
+  "z": 35.667,
+  "types": [
+   "motor"
+  ],
+  "neurotransmitters": [
+   "GABA"
+  ]
+ },
+ {
+  "name": "RID",
+  "x": -1.225,
+  "y": -272.35,
+  "z": 54.938,
+  "types": [
+   "interneuron",
+   "motor"
+  ],
+  "neurotransmitters": []
+ },
+ {
+  "name": "AVAL",
+  "x": -0.55,
+  "y": -271.5,
+  "z": 37.983,
+  "types": [
+   "interneuron"
+  ],
+  "neurotransmitters": []
+ },
+ {
+  "name": "AVAR",
+  "x": -3.5,
+  "y": -271.5,
+  "z": 37.983,
+  "types": [
+   "interneuron"
+  ],
+  "neurotransmitters": []
+ },
+ {
+  "name": "RMDVL",
+  "x": 4.8500004,
+  "y": -271.19998,
+  "z": 44.4,
+  "types": [
+   "motor"
+  ],
+  "neurotransmitters": [
+   "Acetylcholine"
+  ]
+ },
+ {
+  "name": "RMDVR",
+  "x": -9.049999,
+  "y": -271.19998,
+  "z": 44.4,
+  "types": [
+   "motor"
+  ],
+  "neurotransmitters": [
+   "Acetylcholine"
+  ]
+ },
+ {
+  "name": "ALA",
+  "x": -1.35,
+  "y": -271.0,
+  "z": 50.85,
+  "types": [
+   "interneuron"
+  ],
+  "neurotransmitters": []
+ },
+ {
+  "name": "RMDL",
+  "x": 3.1,
+  "y": -271.0,
+  "z": 41.2,
+  "types": [
+   "motor"
+  ],
+  "neurotransmitters": [
+   "Acetylcholine"
+  ]
+ },
+ {
+  "name": "RMDR",
+  "x": -7.4,
+  "y": -271.0,
+  "z": 41.2,
+  "types": [
+   "motor"
+  ],
+  "neurotransmitters": [
+   "Acetylcholine"
+  ]
+ },
+ {
+  "name": "SMDVL",
+  "x": 4.7,
+  "y": -270.95,
+  "z": 46.65,
+  "types": [
+   "motor"
+  ],
+  "neurotransmitters": [
+   "Acetylcholine"
+  ]
+ },
+ {
+  "name": "SMDVR",
+  "x": -8.900001,
+  "y": -270.95,
+  "z": 46.65,
+  "types": [
+   "motor"
+  ],
+  "neurotransmitters": [
+   "Acetylcholine"
+  ]
+ },
+ {
+  "name": "SAAVL",
+  "x": 3.9,
+  "y": -270.90002,
+  "z": 45.425,
+  "types": [
+   "interneuron",
+   "motor"
+  ],
+  "neurotransmitters": [
+   "Acetylcholine"
+  ]
+ },
+ {
+  "name": "SAAVR",
+  "x": -8.175,
+  "y": -270.90002,
+  "z": 45.425,
+  "types": [
+   "interneuron",
+   "motor"
+  ],
+  "neurotransmitters": [
+   "Acetylcholine"
+  ]
+ },
+ {
+  "name": "RIAL",
+  "x": 4.0,
+  "y": -270.25,
+  "z": 45.0,
+  "types": [
+   "interneuron"
+  ],
+  "neurotransmitters": [
+   "Glutamate"
+  ]
+ },
+ {
+  "name": "RIAR",
+  "x": -8.2,
+  "y": -270.25,
+  "z": 45.0,
+  "types": [
+   "interneuron"
+  ],
+  "neurotransmitters": [
+   "Glutamate"
+  ]
+ },
+ {
+  "name": "SAADL",
+  "x": -4.6879997,
+  "y": -270.169,
+  "z": 42.131,
+  "types": [
+   "interneuron",
+   "motor"
+  ],
+  "neurotransmitters": [
+   "Acetylcholine"
+  ]
+ },
+ {
+  "name": "SAADR",
+  "x": 0.531,
+  "y": -270.169,
+  "z": 42.131,
+  "types": [
+   "interneuron",
+   "motor"
+  ],
+  "neurotransmitters": [
+   "Acetylcholine"
+  ]
+ },
+ {
+  "name": "URXL",
+  "x": 3.05,
+  "y": -269.875,
+  "z": 48.275,
+  "types": [
+   "interneuron",
+   "sensory"
+  ],
+  "neurotransmitters": []
+ },
+ {
+  "name": "URXR",
+  "x": -7.35,
+  "y": -269.875,
+  "z": 48.275,
+  "types": [
+   "interneuron",
+   "sensory"
+  ],
+  "neurotransmitters": []
+ },
+ {
+  "name": "SIBVL",
+  "x": -2.667,
+  "y": -269.867,
+  "z": 35.408,
+  "types": [
+   "interneuron",
+   "motor"
+  ],
+  "neurotransmitters": [
+   "Acetylcholine"
+  ]
+ },
+ {
+  "name": "SIBVR",
+  "x": -2.767,
+  "y": -269.867,
+  "z": 35.408,
+  "types": [
+   "interneuron",
+   "motor"
+  ],
+  "neurotransmitters": [
+   "Acetylcholine"
+  ]
+ },
+ {
+  "name": "AVBL",
+  "x": 0.225,
+  "y": -269.794,
+  "z": 37.863003,
+  "types": [
+   "interneuron"
+  ],
+  "neurotransmitters": []
+ },
+ {
+  "name": "AVBR",
+  "x": -4.581,
+  "y": -269.794,
+  "z": 37.863003,
+  "types": [
+   "interneuron"
+  ],
+  "neurotransmitters": []
+ },
+ {
+  "name": "AINL",
+  "x": -1.4499999,
+  "y": -269.542,
+  "z": 39.357998,
+  "types": [
+   "interneuron"
+  ],
+  "neurotransmitters": [
+   "Acetylcholine"
+  ]
+ },
+ {
+  "name": "AINR",
+  "x": -3.067,
+  "y": -269.542,
+  "z": 39.357998,
+  "types": [
+   "interneuron"
+  ],
+  "neurotransmitters": [
+   "Acetylcholine"
+  ]
+ },
+ {
+  "name": "AVEL",
+  "x": 2.75,
+  "y": -269.35,
+  "z": 40.65,
+  "types": [
+   "interneuron"
+  ],
+  "neurotransmitters": []
+ },
+ {
+  "name": "AVER",
+  "x": -8.4,
+  "y": -269.35,
+  "z": 40.65,
+  "types": [
+   "interneuron"
+  ],
+  "neurotransmitters": []
+ },
+ {
+  "name": "SIADR",
+  "x": -0.38300002,
+  "y": -269.19998,
+  "z": 43.65,
+  "types": [
+   "interneuron",
+   "motor"
+  ],
+  "neurotransmitters": [
+   "Acetylcholine"
+  ]
+ },
+ {
+  "name": "SIBDL",
+  "x": -5.2669997,
+  "y": -269.133,
+  "z": 45.8,
+  "types": [
+   "interneuron",
+   "motor"
+  ],
+  "neurotransmitters": [
+   "Acetylcholine"
+  ]
+ },
+ {
+  "name": "SIBDR",
+  "x": 0.96699995,
+  "y": -269.133,
+  "z": 45.8,
+  "types": [
+   "interneuron",
+   "motor"
+  ],
+  "neurotransmitters": [
+   "Acetylcholine"
+  ]
+ },
+ {
+  "name": "RMDDL",
+  "x": 3.6,
+  "y": -269.07498,
+  "z": 37.65,
+  "types": [
+   "motor"
+  ],
+  "neurotransmitters": [
+   "Acetylcholine"
+  ]
+ },
+ {
+  "name": "RMDDR",
+  "x": -7.75,
+  "y": -269.07498,
+  "z": 37.65,
+  "types": [
+   "motor"
+  ],
+  "neurotransmitters": [
+   "Acetylcholine"
+  ]
+ },
+ {
+  "name": "AVDL",
+  "x": -0.167,
+  "y": -268.7,
+  "z": 37.3,
+  "types": [
+   "interneuron"
+  ],
+  "neurotransmitters": []
+ },
+ {
+  "name": "AVDR",
+  "x": -4.033,
+  "y": -268.683,
+  "z": 37.283,
+  "types": [
+   "interneuron"
+  ],
+  "neurotransmitters": []
+ },
+ {
+  "name": "AFDL",
+  "x": 4.5,
+  "y": -268.375,
+  "z": 43.5,
+  "types": [
+   "sensory"
+  ],
+  "neurotransmitters": [
+   "Glutamate"
+  ]
+ },
+ {
+  "name": "AFDR",
+  "x": -8.75,
+  "y": -268.375,
+  "z": 43.5,
+  "types": [
+   "sensory"
+  ],
+  "neurotransmitters": [
+   "Glutamate"
+  ]
+ },
+ {
+  "name": "ASKL",
+  "x": 3.7,
+  "y": -268.025,
+  "z": 46.399998,
+  "types": [
+   "sensory"
+  ],
+  "neurotransmitters": [
+   "Glutamate"
+  ]
+ },
+ {
+  "name": "ASKR",
+  "x": -8.0,
+  "y": -268.025,
+  "z": 46.399998,
+  "types": [
+   "sensory"
+  ],
+  "neurotransmitters": [
+   "Glutamate"
+  ]
+ },
+ {
+  "name": "AWCL",
+  "x": 3.8,
+  "y": -267.95,
+  "z": 38.95,
+  "types": [
+   "sensory"
+  ],
+  "neurotransmitters": [
+   "Glutamate"
+  ]
+ },
+ {
+  "name": "AWCR",
+  "x": -8.1,
+  "y": -267.95,
+  "z": 38.95,
+  "types": [
+   "sensory"
+  ],
+  "neurotransmitters": [
+   "Glutamate"
+  ]
+ },
+ {
+  "name": "ADFL",
+  "x": 3.7250001,
+  "y": -267.9,
+  "z": 41.600002,
+  "types": [
+   "sensory"
+  ],
+  "neurotransmitters": [
+   "Serotonin"
+  ]
+ },
+ {
+  "name": "ADFR",
+  "x": -8.0,
+  "y": -267.9,
+  "z": 41.600002,
+  "types": [
+   "sensory"
+  ],
+  "neurotransmitters": [
+   "Serotonin"
+  ]
+ },
+ {
+  "name": "SIADL",
+  "x": -3.958,
+  "y": -267.658,
+  "z": 43.967,
+  "types": [
+   "interneuron",
+   "motor"
+  ],
+  "neurotransmitters": [
+   "Acetylcholine"
+  ]
+ },
+ {
+  "name": "RIH",
+  "x": -2.0,
+  "y": -267.35,
+  "z": 35.95,
+  "types": [
+   "interneuron"
+  ],
+  "neurotransmitters": [
+   "Serotonin"
+  ]
+ },
+ {
+  "name": "RICL",
+  "x": -0.737,
+  "y": -267.063,
+  "z": 38.087,
+  "types": [
+   "interneuron"
+  ],
+  "neurotransmitters": [
+   "Octopamine"
+  ]
+ },
+ {
+  "name": "RICR",
+  "x": -3.563,
+  "y": -267.063,
+  "z": 38.087,
+  "types": [
+   "interneuron"
+  ],
+  "neurotransmitters": [
+   "Octopamine"
+  ]
+ },
+ {
+  "name": "SMDDL",
+  "x": 3.25,
+  "y": -266.25,
+  "z": 34.1,
+  "types": [
+   "motor"
+  ],
+  "neurotransmitters": [
+   "Acetylcholine"
+  ]
+ },
+ {
+  "name": "SMDDR",
+  "x": -7.4500003,
+  "y": -266.25,
+  "z": 34.1,
+  "types": [
+   "motor"
+  ],
+  "neurotransmitters": [
+   "Acetylcholine"
+  ]
+ },
+ {
+  "name": "AWBL",
+  "x": 5.5,
+  "y": -266.225,
+  "z": 43.1,
+  "types": [
+   "sensory"
+  ],
+  "neurotransmitters": []
+ },
+ {
+  "name": "AWBR",
+  "x": -9.75,
+  "y": -266.225,
+  "z": 43.1,
+  "types": [
+   "sensory"
+  ],
+  "neurotransmitters": []
+ },
+ {
+  "name": "AIBL",
+  "x": 2.7,
+  "y": -266.19998,
+  "z": 37.0,
+  "types": [
+   "interneuron"
+  ],
+  "neurotransmitters": [
+   "Glutamate"
+  ]
+ },
+ {
+  "name": "AIBR",
+  "x": -6.8999996,
+  "y": -266.19998,
+  "z": 37.0,
+  "types": [
+   "interneuron"
+  ],
+  "neurotransmitters": []
+ },
+ {
+  "name": "RIR",
+  "x": -11.599999,
+  "y": -265.9,
+  "z": 36.649998,
+  "types": [
+   "interneuron"
+  ],
+  "neurotransmitters": []
+ },
+ {
+  "name": "RMHL",
+  "x": 1.1,
+  "y": -265.9,
+  "z": 35.7,
+  "types": [
+   "motor"
+  ],
+  "neurotransmitters": []
+ },
+ {
+  "name": "RMHR",
+  "x": -5.2999997,
+  "y": -265.9,
+  "z": 35.7,
+  "types": [
+   "motor"
+  ],
+  "neurotransmitters": []
+ },
+ {
+  "name": "AWAL",
+  "x": 3.9,
+  "y": -265.875,
+  "z": 42.75,
+  "types": [
+   "sensory"
+  ],
+  "neurotransmitters": []
+ },
+ {
+  "name": "AWAR",
+  "x": -8.2,
+  "y": -265.875,
+  "z": 42.75,
+  "types": [
+   "sensory"
+  ],
+  "neurotransmitters": []
+ },
+ {
+  "name": "ADLL",
+  "x": 2.7,
+  "y": -265.75,
+  "z": 47.55,
+  "types": [
+   "sensory"
+  ],
+  "neurotransmitters": []
+ },
+ {
+  "name": "ADLR",
+  "x": -6.95,
+  "y": -265.75,
+  "z": 47.55,
+  "types": [
+   "sensory"
+  ],
+  "neurotransmitters": []
+ },
+ {
+  "name": "ASHL",
+  "x": 5.55,
+  "y": -265.625,
+  "z": 41.0,
+  "types": [
+   "sensory"
+  ],
+  "neurotransmitters": [
+   "Glutamate"
+  ]
+ },
+ {
+  "name": "ASHR",
+  "x": -9.8,
+  "y": -265.625,
+  "z": 41.0,
+  "types": [
+   "sensory"
+  ],
+  "neurotransmitters": [
+   "Glutamate"
+  ]
+ },
+ {
+  "name": "ASGL",
+  "x": 3.7,
+  "y": -265.35,
+  "z": 45.425,
+  "types": [
+   "sensory"
+  ],
+  "neurotransmitters": [
+   "Glutamate",
+   "Serotonin"
+  ]
+ },
+ {
+  "name": "ASGR",
+  "x": -8.0,
+  "y": -265.35,
+  "z": 45.425,
+  "types": [
+   "sensory"
+  ],
+  "neurotransmitters": [
+   "Glutamate",
+   "Serotonin"
+  ]
+ },
+ {
+  "name": "RIVL",
+  "x": 4.5,
+  "y": -265.30002,
+  "z": 50.35,
+  "types": [
+   "interneuron",
+   "motor"
+  ],
+  "neurotransmitters": []
+ },
+ {
+  "name": "RIVR",
+  "x": -8.75,
+  "y": -265.30002,
+  "z": 50.35,
+  "types": [
+   "interneuron",
+   "motor"
+  ],
+  "neurotransmitters": []
+ },
+ {
+  "name": "RMFL",
+  "x": 1.1,
+  "y": -265.05002,
+  "z": 34.1,
+  "types": [
+   "motor"
+  ],
+  "neurotransmitters": []
+ },
+ {
+  "name": "RMFR",
+  "x": -5.4,
+  "y": -265.05002,
+  "z": 34.1,
+  "types": [
+   "motor"
+  ],
+  "neurotransmitters": []
+ },
+ {
+  "name": "AVJL",
+  "x": 0.2,
+  "y": -264.9,
+  "z": 47.55,
+  "types": [
+   "interneuron"
+  ],
+  "neurotransmitters": []
+ },
+ {
+  "name": "AVJR",
+  "x": -4.75,
+  "y": -264.9,
+  "z": 47.55,
+  "types": [
+   "interneuron"
+  ],
+  "neurotransmitters": []
+ },
+ {
+  "name": "AVHL",
+  "x": 4.1499996,
+  "y": -264.4,
+  "z": 45.0,
+  "types": [
+   "interneuron"
+  ],
+  "neurotransmitters": []
+ },
+ {
+  "name": "AVHR",
+  "x": -8.900001,
+  "y": -264.4,
+  "z": 45.0,
+  "types": [
+   "interneuron"
+  ],
+  "neurotransmitters": []
+ },
+ {
+  "name": "RIBL",
+  "x": 5.5,
+  "y": -264.35,
+  "z": 38.0,
+  "types": [
+   "interneuron"
+  ],
+  "neurotransmitters": []
+ },
+ {
+  "name": "RIBR",
+  "x": -9.8,
+  "y": -264.35,
+  "z": 38.0,
+  "types": [
+   "interneuron"
+  ],
+  "neurotransmitters": []
+ },
+ {
+  "name": "SMBDL",
+  "x": 3.1,
+  "y": -264.3,
+  "z": 33.1,
+  "types": [
+   "motor"
+  ],
+  "neurotransmitters": [
+   "Acetylcholine"
+  ]
+ },
+ {
+  "name": "SMBDR",
+  "x": -7.0,
+  "y": -264.3,
+  "z": 33.1,
+  "types": [
+   "motor"
+  ],
+  "neurotransmitters": [
+   "Acetylcholine"
+  ]
+ },
+ {
+  "name": "AIAL",
+  "x": 0.8,
+  "y": -264.15,
+  "z": 35.550003,
+  "types": [
+   "interneuron"
+  ],
+  "neurotransmitters": [
+   "Acetylcholine"
+  ]
+ },
+ {
+  "name": "AIAR",
+  "x": -5.1,
+  "y": -264.15,
+  "z": 35.550003,
+  "types": [
+   "interneuron"
+  ],
+  "neurotransmitters": [
+   "Acetylcholine"
+  ]
+ },
+ {
+  "name": "AUAL",
+  "x": 4.5,
+  "y": -263.975,
+  "z": 37.475,
+  "types": [
+   "interneuron"
+  ],
+  "neurotransmitters": [
+   "Glutamate"
+  ]
+ },
+ {
+  "name": "AUAR",
+  "x": -8.8,
+  "y": -263.975,
+  "z": 37.475,
+  "types": [
+   "interneuron"
+  ],
+  "neurotransmitters": [
+   "Glutamate"
+  ]
+ },
+ {
+  "name": "ASIL",
+  "x": 2.6499999,
+  "y": -263.7,
+  "z": 46.875,
+  "types": [
+   "sensory"
+  ],
+  "neurotransmitters": []
+ },
+ {
+  "name": "ASIR",
+  "x": -6.8999996,
+  "y": -263.7,
+  "z": 46.875,
+  "types": [
+   "sensory"
+  ],
+  "neurotransmitters": []
+ },
+ {
+  "name": "ASEL",
+  "x": 4.125,
+  "y": -263.675,
+  "z": 40.05,
+  "types": [
+   "sensory"
+  ],
+  "neurotransmitters": [
+   "Glutamate"
+  ]
+ },
+ {
+  "name": "ASER",
+  "x": -8.375,
+  "y": -263.675,
+  "z": 40.05,
+  "types": [
+   "sensory"
+  ],
+  "neurotransmitters": [
+   "Glutamate"
+  ]
+ },
+ {
+  "name": "AVL",
+  "x": -7.5000005,
+  "y": -263.45,
+  "z": 36.35,
+  "types": [
+   "interneuron",
+   "motor"
+  ],
+  "neurotransmitters": [
+   "GABA"
+  ]
+ },
+ {
+  "name": "SMBVL",
+  "x": 0.425,
+  "y": -263.45,
+  "z": 33.05,
+  "types": [
+   "motor"
+  ],
+  "neurotransmitters": [
+   "Acetylcholine"
+  ]
+ },
+ {
+  "name": "SMBVR",
+  "x": -4.6,
+  "y": -263.45,
+  "z": 33.05,
+  "types": [
+   "motor"
+  ],
+  "neurotransmitters": [
+   "Acetylcholine"
+  ]
+ },
+ {
+  "name": "ASJL",
+  "x": 2.9750001,
+  "y": -263.0,
+  "z": 37.475,
+  "types": [
+   "sensory"
+  ],
+  "neurotransmitters": []
+ },
+ {
+  "name": "ASJR",
+  "x": -7.25,
+  "y": -263.0,
+  "z": 37.475,
+  "types": [
+   "sensory"
+  ],
+  "neurotransmitters": []
+ },
+ {
+  "name": "RIS",
+  "x": -4.8250003,
+  "y": -262.163,
+  "z": 33.638,
+  "types": [
+   "interneuron"
+  ],
+  "neurotransmitters": [
+   "GABA"
+  ]
+ },
+ {
+  "name": "RIML",
+  "x": 3.5,
+  "y": -260.9,
+  "z": 39.0,
+  "types": [
+   "interneuron",
+   "motor"
+  ],
+  "neurotransmitters": [
+   "Acetylcholine",
+   "Glutamate",
+   "Tyramine"
+  ]
+ },
+ {
+  "name": "RIMR",
+  "x": -7.75,
+  "y": -260.9,
+  "z": 39.0,
+  "types": [
+   "interneuron",
+   "motor"
+  ],
+  "neurotransmitters": [
+   "Acetylcholine",
+   "Glutamate",
+   "Tyramine"
+  ]
+ },
+ {
+  "name": "SIAVL",
+  "x": 5.9500003,
+  "y": -259.80002,
+  "z": 32.25,
+  "types": [
+   "interneuron",
+   "motor"
+  ],
+  "neurotransmitters": [
+   "Acetylcholine"
+  ]
+ },
+ {
+  "name": "SIAVR",
+  "x": -10.2,
+  "y": -259.80002,
+  "z": 32.25,
+  "types": [
+   "interneuron",
+   "motor"
+  ],
+  "neurotransmitters": [
+   "Acetylcholine"
+  ]
+ },
+ {
+  "name": "AIZL",
+  "x": 5.6000004,
+  "y": -258.75,
+  "z": 37.45,
+  "types": [
+   "interneuron"
+  ],
+  "neurotransmitters": [
+   "Glutamate"
+  ]
+ },
+ {
+  "name": "AIZR",
+  "x": -9.95,
+  "y": -258.75,
+  "z": 37.45,
+  "types": [
+   "interneuron"
+  ],
+  "neurotransmitters": [
+   "Glutamate"
+  ]
+ },
+ {
+  "name": "AVKL",
+  "x": 1.65,
+  "y": -255.0,
+  "z": 22.575,
+  "types": [
+   "interneuron"
+  ],
+  "neurotransmitters": []
+ },
+ {
+  "name": "M2L",
+  "x": 3.7,
+  "y": -254.34999,
+  "z": 38.65,
+  "types": [
+   "motor"
+  ],
+  "neurotransmitters": [
+   "Acetylcholine"
+  ]
+ },
+ {
+  "name": "M2R",
+  "x": -8.0,
+  "y": -254.34999,
+  "z": 38.65,
+  "types": [
+   "motor"
+  ],
+  "neurotransmitters": [
+   "Acetylcholine"
+  ]
+ },
+ {
+  "name": "I4",
+  "x": -2.05,
+  "y": -253.90001,
+  "z": 43.1,
+  "types": [
+   "interneuron"
+  ],
+  "neurotransmitters": []
+ },
+ {
+  "name": "AIML",
+  "x": 9.25,
+  "y": -253.44998,
+  "z": 28.400002,
+  "types": [
+   "interneuron"
+  ],
+  "neurotransmitters": [
+   "Glutamate",
+   "Serotonin"
+  ]
+ },
+ {
+  "name": "AIMR",
+  "x": -13.500001,
+  "y": -253.44998,
+  "z": 28.400002,
+  "types": [
+   "interneuron"
+  ],
+  "neurotransmitters": [
+   "Glutamate",
+   "Serotonin"
+  ]
+ },
+ {
+  "name": "VB2",
+  "x": -2.0,
+  "y": -253.3,
+  "z": 19.85,
+  "types": [
+   "motor",
+   "sensory"
+  ],
+  "neurotransmitters": [
+   "Acetylcholine"
+  ]
+ },
+ {
+  "name": "AIYL",
+  "x": 7.4500003,
+  "y": -252.50002,
+  "z": 28.95,
+  "types": [
+   "interneuron"
+  ],
+  "neurotransmitters": [
+   "Acetylcholine"
+  ]
+ },
+ {
+  "name": "AIYR",
+  "x": -11.7,
+  "y": -252.50002,
+  "z": 28.95,
+  "types": [
+   "interneuron"
+  ],
+  "neurotransmitters": [
+   "Acetylcholine"
+  ]
+ },
+ {
+  "name": "M1",
+  "x": -0.86700004,
+  "y": -252.135,
+  "z": 44.420002,
+  "types": [
+   "motor"
+  ],
+  "neurotransmitters": [
+   "Acetylcholine"
+  ]
+ },
+ {
+  "name": "I6",
+  "x": 1.7,
+  "y": -251.65,
+  "z": 43.05,
+  "types": [
+   "interneuron",
+   "sensory"
+  ],
+  "neurotransmitters": [
+   "Acetylcholine"
+  ]
+ },
+ {
+  "name": "SABVL",
+  "x": 3.325,
+  "y": -249.25,
+  "z": 24.349998,
+  "types": [
+   "interneuron",
+   "motor"
+  ],
+  "neurotransmitters": [
+   "Acetylcholine"
+  ]
+ },
+ {
+  "name": "SABVR",
+  "x": -8.1,
+  "y": -249.25,
+  "z": 24.349998,
+  "types": [
+   "interneuron",
+   "motor"
+  ],
+  "neurotransmitters": [
+   "Acetylcholine"
+  ]
+ },
+ {
+  "name": "I5",
+  "x": -2.1,
+  "y": -247.84999,
+  "z": 30.675,
+  "types": [
+   "interneuron",
+   "sensory"
+  ],
+  "neurotransmitters": [
+   "Glutamate",
+   "Serotonin"
+  ]
+ },
+ {
+  "name": "AVKR",
+  "x": -4.583,
+  "y": -246.95001,
+  "z": 19.0,
+  "types": [
+   "interneuron"
+  ],
+  "neurotransmitters": []
+ },
+ {
+  "name": "VB1",
+  "x": -1.55,
+  "y": -246.45,
+  "z": 16.4,
+  "types": [
+   "motor",
+   "sensory"
+  ],
+  "neurotransmitters": [
+   "Acetylcholine"
+  ]
+ },
+ {
+  "name": "AVFL",
+  "x": 2.1,
+  "y": -246.4,
+  "z": 18.6,
+  "types": [
+   "interneuron"
+  ],
+  "neurotransmitters": []
+ },
+ {
+  "name": "AVFR",
+  "x": -6.5,
+  "y": -246.4,
+  "z": 18.6,
+  "types": [
+   "interneuron"
+  ],
+  "neurotransmitters": []
+ },
+ {
+  "name": "FLPL",
+  "x": 10.875,
+  "y": -246.3,
+  "z": 31.05,
+  "types": [
+   "sensory"
+  ],
+  "neurotransmitters": [
+   "Glutamate"
+  ]
+ },
+ {
+  "name": "FLPR",
+  "x": -15.05,
+  "y": -246.3,
+  "z": 31.05,
+  "types": [
+   "sensory"
+  ],
+  "neurotransmitters": [
+   "Glutamate"
+  ]
+ },
+ {
+  "name": "RIFR",
+  "x": -5.15,
+  "y": -245.5,
+  "z": 23.9,
+  "types": [
+   "interneuron"
+  ],
+  "neurotransmitters": []
+ },
+ {
+  "name": "DB2",
+  "x": -0.2,
+  "y": -244.5,
+  "z": 15.787,
+  "types": [
+   "motor"
+  ],
+  "neurotransmitters": [
+   "Acetylcholine"
+  ]
+ },
+ {
+  "name": "AQR",
+  "x": -14.8,
+  "y": -243.05,
+  "z": 33.95,
+  "types": [
+   "sensory"
+  ],
+  "neurotransmitters": [
+   "Glutamate"
+  ]
+ },
+ {
+  "name": "ADEL",
+  "x": 11.0,
+  "y": -242.375,
+  "z": 32.45,
+  "types": [
+   "sensory"
+  ],
+  "neurotransmitters": [
+   "Dopamine"
+  ]
+ },
+ {
+  "name": "ADER",
+  "x": -15.299999,
+  "y": -242.375,
+  "z": 32.45,
+  "types": [
+   "sensory"
+  ],
+  "neurotransmitters": [
+   "Dopamine"
+  ]
+ },
+ {
+  "name": "RIGR",
+  "x": -4.7,
+  "y": -241.95001,
+  "z": 20.65,
+  "types": [
+   "interneuron"
+  ],
+  "neurotransmitters": [
+   "Glutamate"
+  ]
+ },
+ {
+  "name": "M5",
+  "x": -2.2,
+  "y": -241.45,
+  "z": 41.800003,
+  "types": [
+   "motor"
+  ],
+  "neurotransmitters": [
+   "Acetylcholine"
+  ]
+ },
+ {
+  "name": "RIFL",
+  "x": 0.0,
+  "y": -239.84999,
+  "z": 18.35,
+  "types": [
+   "interneuron"
+  ],
+  "neurotransmitters": []
+ },
+ {
+  "name": "ADAL",
+  "x": 8.65,
+  "y": -239.25,
+  "z": 31.05,
+  "types": [
+   "interneuron"
+  ],
+  "neurotransmitters": [
+   "Glutamate"
+  ]
+ },
+ {
+  "name": "ADAR",
+  "x": -12.9,
+  "y": -239.25,
+  "z": 31.05,
+  "types": [
+   "interneuron"
+  ],
+  "neurotransmitters": [
+   "Glutamate"
+  ]
+ },
+ {
+  "name": "RMGL",
+  "x": 8.25,
+  "y": -238.29999,
+  "z": 32.7,
+  "types": [
+   "interneuron"
+  ],
+  "neurotransmitters": []
+ },
+ {
+  "name": "RMGR",
+  "x": -12.5,
+  "y": -238.29999,
+  "z": 32.7,
+  "types": [
+   "interneuron"
+  ],
+  "neurotransmitters": []
+ },
+ {
+  "name": "AVG",
+  "x": -2.0,
+  "y": -237.1,
+  "z": 12.85,
+  "types": [
+   "interneuron"
+  ],
+  "neurotransmitters": []
+ },
+ {
+  "name": "VA1",
+  "x": -1.35,
+  "y": -235.55,
+  "z": 11.75,
+  "types": [
+   "motor"
+  ],
+  "neurotransmitters": [
+   "Acetylcholine"
+  ]
+ },
+ {
+  "name": "SABD",
+  "x": -3.2,
+  "y": -234.8,
+  "z": 14.925,
+  "types": [
+   "interneuron",
+   "motor"
+  ],
+  "neurotransmitters": [
+   "Acetylcholine"
+  ]
+ },
+ {
+  "name": "RIGL",
+  "x": 0.0,
+  "y": -233.25,
+  "z": 16.35,
+  "types": [
+   "interneuron"
+  ],
+  "neurotransmitters": [
+   "Glutamate"
+  ]
+ },
+ {
+  "name": "DD1",
+  "x": -0.9,
+  "y": -231.95,
+  "z": 6.85,
+  "types": [
+   "motor"
+  ],
+  "neurotransmitters": [
+   "GABA"
+  ]
+ },
+ {
+  "name": "DB1",
+  "x": -1.9,
+  "y": -230.34999,
+  "z": 6.85,
+  "types": [
+   "motor"
+  ],
+  "neurotransmitters": [
+   "Acetylcholine"
+  ]
+ },
+ {
+  "name": "AS1",
+  "x": -0.275,
+  "y": -229.038,
+  "z": 4.738,
+  "types": [
+   "motor"
+  ],
+  "neurotransmitters": [
+   "Acetylcholine"
+  ]
+ },
+ {
+  "name": "VD1",
+  "x": -0.70000005,
+  "y": -228.6,
+  "z": 4.05,
+  "types": [
+   "motor"
+  ],
+  "neurotransmitters": [
+   "GABA"
+  ]
+ },
+ {
+  "name": "DA1",
+  "x": -0.75,
+  "y": -227.07501,
+  "z": 3.425,
+  "types": [
+   "motor"
+  ],
+  "neurotransmitters": [
+   "Acetylcholine"
+  ]
+ },
+ {
+  "name": "VD2",
+  "x": -0.65000004,
+  "y": -226.04999,
+  "z": 2.35,
+  "types": [
+   "motor"
+  ],
+  "neurotransmitters": [
+   "GABA"
+  ]
+ },
+ {
+  "name": "VA2",
+  "x": -1.85,
+  "y": -217.1,
+  "z": -3.9500003,
+  "types": [
+   "motor"
+  ],
+  "neurotransmitters": [
+   "Acetylcholine"
+  ]
+ },
+ {
+  "name": "VB3",
+  "x": -1.85,
+  "y": -210.225,
+  "z": -8.725,
+  "types": [
+   "motor",
+   "sensory"
+  ],
+  "neurotransmitters": [
+   "Acetylcholine"
+  ]
+ },
+ {
+  "name": "AS2",
+  "x": -1.8750001,
+  "y": -203.875,
+  "z": -12.725,
+  "types": [
+   "motor"
+  ],
+  "neurotransmitters": [
+   "Acetylcholine"
+  ]
+ },
+ {
+  "name": "DB3",
+  "x": -1.85,
+  "y": -195.275,
+  "z": -18.525,
+  "types": [
+   "motor"
+  ],
+  "neurotransmitters": [
+   "Acetylcholine"
+  ]
+ },
+ {
+  "name": "DA2",
+  "x": -1.9,
+  "y": -190.75,
+  "z": -21.675,
+  "types": [
+   "motor"
+  ],
+  "neurotransmitters": [
+   "Acetylcholine"
+  ]
+ },
+ {
+  "name": "VD3",
+  "x": -0.8,
+  "y": -188.1,
+  "z": -23.45,
+  "types": [
+   "motor"
+  ],
+  "neurotransmitters": [
+   "GABA"
+  ]
+ },
+ {
+  "name": "BDUL",
+  "x": 15.35,
+  "y": -187.15,
+  "z": -0.2,
+  "types": [
+   "interneuron"
+  ],
+  "neurotransmitters": []
+ },
+ {
+  "name": "BDUR",
+  "x": -19.65,
+  "y": -187.15,
+  "z": -0.2,
+  "types": [
+   "interneuron"
+  ],
+  "neurotransmitters": []
+ },
+ {
+  "name": "VA3",
+  "x": -1.475,
+  "y": -184.09999,
+  "z": -26.374998,
+  "types": [
+   "motor"
+  ],
+  "neurotransmitters": [
+   "Acetylcholine"
+  ]
+ },
+ {
+  "name": "VB4",
+  "x": -2.0,
+  "y": -173.25,
+  "z": -33.5,
+  "types": [
+   "motor",
+   "sensory"
+  ],
+  "neurotransmitters": [
+   "Acetylcholine"
+  ]
+ },
+ {
+  "name": "VC1",
+  "x": -0.72499996,
+  "y": -170.02501,
+  "z": -35.75,
+  "types": [
+   "motor"
+  ],
+  "neurotransmitters": [
+   "Acetylcholine"
+  ]
+ },
+ {
+  "name": "DD2",
+  "x": -1.85,
+  "y": -156.47499,
+  "z": -42.85,
+  "types": [
+   "motor"
+  ],
+  "neurotransmitters": [
+   "GABA"
+  ]
+ },
+ {
+  "name": "AS3",
+  "x": -1.9,
+  "y": -151.40001,
+  "z": -45.649998,
+  "types": [
+   "motor"
+  ],
+  "neurotransmitters": [
+   "Acetylcholine"
+  ]
+ },
+ {
+  "name": "VD4",
+  "x": -0.8,
+  "y": -137.2,
+  "z": -52.7,
+  "types": [
+   "motor"
+  ],
+  "neurotransmitters": [
+   "GABA"
+  ]
+ },
+ {
+  "name": "SDQR",
+  "x": -14.200001,
+  "y": -131.75,
+  "z": -10.55,
+  "types": [
+   "interneuron",
+   "sensory"
+  ],
+  "neurotransmitters": [
+   "Acetylcholine"
+  ]
+ },
+ {
+  "name": "DA3",
+  "x": -1.65,
+  "y": -123.65,
+  "z": -58.350002,
+  "types": [
+   "motor"
+  ],
+  "neurotransmitters": [
+   "Acetylcholine"
+  ]
+ },
+ {
+  "name": "VA4",
+  "x": -1.85,
+  "y": -119.50001,
+  "z": -58.7,
+  "types": [
+   "motor"
+  ],
+  "neurotransmitters": [
+   "Acetylcholine"
+  ]
+ },
+ {
+  "name": "VB5",
+  "x": -1.85,
+  "y": -109.55,
+  "z": -62.15,
+  "types": [
+   "motor",
+   "sensory"
+  ],
+  "neurotransmitters": [
+   "Acetylcholine"
+  ]
+ },
+ {
+  "name": "VC2",
+  "x": -0.625,
+  "y": -105.325,
+  "z": -63.4,
+  "types": [
+   "motor"
+  ],
+  "neurotransmitters": [
+   "Acetylcholine"
+  ]
+ },
+ {
+  "name": "DB4",
+  "x": -1.8750001,
+  "y": -96.275,
+  "z": -64.65,
+  "types": [
+   "motor"
+  ],
+  "neurotransmitters": [
+   "Acetylcholine"
+  ]
+ },
+ {
+  "name": "AS4",
+  "x": -1.8750001,
+  "y": -90.200005,
+  "z": -65.375,
+  "types": [
+   "motor"
+  ],
+  "neurotransmitters": [
+   "Acetylcholine"
+  ]
+ },
+ {
+  "name": "VD5",
+  "x": -0.75,
+  "y": -68.3,
+  "z": -66.75,
+  "types": [
+   "motor"
+  ],
+  "neurotransmitters": [
+   "GABA"
+  ]
+ },
+ {
+  "name": "ALML",
+  "x": 22.675,
+  "y": -60.75,
+  "z": -37.149998,
+  "types": [
+   "sensory"
+  ],
+  "neurotransmitters": [
+   "Glutamate"
+  ]
+ },
+ {
+  "name": "ALMR",
+  "x": -24.15,
+  "y": -60.75,
+  "z": -37.149998,
+  "types": [
+   "sensory"
+  ],
+  "neurotransmitters": [
+   "Glutamate"
+  ]
+ },
+ {
+  "name": "AVM",
+  "x": -20.5,
+  "y": -55.65,
+  "z": -44.600002,
+  "types": [
+   "sensory"
+  ],
+  "neurotransmitters": [
+   "Glutamate"
+  ]
+ },
+ {
+  "name": "VA5",
+  "x": -1.85,
+  "y": -54.3,
+  "z": -66.049995,
+  "types": [
+   "motor"
+  ],
+  "neurotransmitters": [
+   "Acetylcholine"
+  ]
+ },
+ {
+  "name": "VB6",
+  "x": -1.85,
+  "y": -36.575,
+  "z": -62.699997,
+  "types": [
+   "motor",
+   "sensory"
+  ],
+  "neurotransmitters": [
+   "Acetylcholine"
+  ]
+ },
+ {
+  "name": "DA4",
+  "x": -1.7,
+  "y": -32.4,
+  "z": -61.75,
+  "types": [
+   "motor"
+  ],
+  "neurotransmitters": [
+   "Acetylcholine"
+  ]
+ },
+ {
+  "name": "DD3",
+  "x": -1.9,
+  "y": -28.600002,
+  "z": -60.525,
+  "types": [
+   "motor"
+  ],
+  "neurotransmitters": [
+   "GABA"
+  ]
+ },
+ {
+  "name": "VC3",
+  "x": -1.4499999,
+  "y": -6.45,
+  "z": -54.000004,
+  "types": [
+   "motor"
+  ],
+  "neurotransmitters": [
+   "Acetylcholine"
+  ]
+ },
+ {
+  "name": "AS5",
+  "x": -1.8750001,
+  "y": -3.7500002,
+  "z": -52.525,
+  "types": [
+   "motor"
+  ],
+  "neurotransmitters": [
+   "Acetylcholine"
+  ]
+ },
+ {
+  "name": "VD6",
+  "x": -0.70000005,
+  "y": -1.4000001,
+  "z": -52.149998,
+  "types": [
+   "motor"
+  ],
+  "neurotransmitters": [
+   "GABA"
+  ]
+ },
+ {
+  "name": "VA6",
+  "x": -1.85,
+  "y": 21.55,
+  "z": -41.15,
+  "types": [
+   "motor"
+  ],
+  "neurotransmitters": [
+   "Acetylcholine"
+  ]
+ },
+ {
+  "name": "AS6",
+  "x": -1.9,
+  "y": 28.25,
+  "z": -34.25,
+  "types": [
+   "motor"
+  ],
+  "neurotransmitters": [
+   "Acetylcholine"
+  ]
+ },
+ {
+  "name": "DB5",
+  "x": -4.05,
+  "y": 35.25,
+  "z": -30.45,
+  "types": [
+   "motor"
+  ],
+  "neurotransmitters": [
+   "Acetylcholine"
+  ]
+ },
+ {
+  "name": "VB7",
+  "x": -9.675,
+  "y": 41.45,
+  "z": -24.362,
+  "types": [
+   "motor",
+   "sensory"
+  ],
+  "neurotransmitters": [
+   "Acetylcholine"
+  ]
+ },
+ {
+  "name": "VC4",
+  "x": -1.15,
+  "y": 43.85,
+  "z": -24.2,
+  "types": [
+   "motor"
+  ],
+  "neurotransmitters": [
+   "Acetylcholine",
+   "Serotonin"
+  ]
+ },
+ {
+  "name": "CANL",
+  "x": 25.350002,
+  "y": 47.95,
+  "z": 1.65,
+  "types": [
+   "unknown"
+  ],
+  "neurotransmitters": []
+ },
+ {
+  "name": "CANR",
+  "x": -27.25,
+  "y": 47.95,
+  "z": 1.65,
+  "types": [
+   "unknown"
+  ],
+  "neurotransmitters": []
+ },
+ {
+  "name": "VD7",
+  "x": -12.349999,
+  "y": 57.95,
+  "z": -14.200001,
+  "types": [
+   "motor"
+  ],
+  "neurotransmitters": [
+   "GABA"
+  ]
+ },
+ {
+  "name": "HSNL",
+  "x": 17.45,
+  "y": 61.05,
+  "z": 6.95,
+  "types": [
+   "motor"
+  ],
+  "neurotransmitters": [
+   "Serotonin"
+  ]
+ },
+ {
+  "name": "HSNR",
+  "x": -21.65,
+  "y": 61.05,
+  "z": 6.95,
+  "types": [
+   "motor"
+  ],
+  "neurotransmitters": [
+   "Serotonin"
+  ]
+ },
+ {
+  "name": "VC5",
+  "x": -1.15,
+  "y": 66.549995,
+  "z": -12.5,
+  "types": [
+   "motor"
+  ],
+  "neurotransmitters": [
+   "Acetylcholine",
+   "Serotonin"
+  ]
+ },
+ {
+  "name": "DA5",
+  "x": -1.65,
+  "y": 84.2,
+  "z": -3.15,
+  "types": [
+   "motor"
+  ],
+  "neurotransmitters": [
+   "Acetylcholine"
+  ]
+ },
+ {
+  "name": "VA7",
+  "x": -1.85,
+  "y": 98.049995,
+  "z": 1.175,
+  "types": [
+   "motor"
+  ],
+  "neurotransmitters": [
+   "Acetylcholine"
+  ]
+ },
+ {
+  "name": "VB8",
+  "x": -1.8249999,
+  "y": 108.8,
+  "z": 2.875,
+  "types": [
+   "motor",
+   "sensory"
+  ],
+  "neurotransmitters": [
+   "Acetylcholine"
+  ]
+ },
+ {
+  "name": "AS7",
+  "x": -1.9,
+  "y": 119.9,
+  "z": 3.9500003,
+  "types": [
+   "motor"
+  ],
+  "neurotransmitters": [
+   "Acetylcholine"
+  ]
+ },
+ {
+  "name": "DD4",
+  "x": -1.8750001,
+  "y": 122.899994,
+  "z": 4.5499997,
+  "types": [
+   "motor"
+  ],
+  "neurotransmitters": [
+   "GABA"
+  ]
+ },
+ {
+  "name": "VD8",
+  "x": -0.75,
+  "y": 135.09999,
+  "z": 3.9500003,
+  "types": [
+   "motor"
+  ],
+  "neurotransmitters": [
+   "GABA"
+  ]
+ },
+ {
+  "name": "PDEL",
+  "x": 25.75,
+  "y": 143.8,
+  "z": 25.6,
+  "types": [
+   "sensory"
+  ],
+  "neurotransmitters": [
+   "Dopamine"
+  ]
+ },
+ {
+  "name": "PDER",
+  "x": -27.35,
+  "y": 143.8,
+  "z": 25.6,
+  "types": [
+   "sensory"
+  ],
+  "neurotransmitters": [
+   "Dopamine"
+  ]
+ },
+ {
+  "name": "VA8",
+  "x": -1.8,
+  "y": 150.3,
+  "z": 3.4,
+  "types": [
+   "motor"
+  ],
+  "neurotransmitters": [
+   "Acetylcholine"
+  ]
+ },
+ {
+  "name": "VB9",
+  "x": -1.85,
+  "y": 159.55,
+  "z": 3.2,
+  "types": [
+   "motor",
+   "sensory"
+  ],
+  "neurotransmitters": [
+   "Acetylcholine"
+  ]
+ },
+ {
+  "name": "VC6",
+  "x": -1.8249999,
+  "y": 174.175,
+  "z": 1.0,
+  "types": [
+   "motor"
+  ],
+  "neurotransmitters": [
+   "Acetylcholine"
+  ]
+ },
+ {
+  "name": "PVDL",
+  "x": 24.749,
+  "y": 175.151,
+  "z": 24.952,
+  "types": [
+   "sensory"
+  ],
+  "neurotransmitters": [
+   "Glutamate"
+  ]
+ },
+ {
+  "name": "PVDR",
+  "x": -26.113998,
+  "y": 175.151,
+  "z": 24.952,
+  "types": [
+   "sensory"
+  ],
+  "neurotransmitters": [
+   "Glutamate"
+  ]
+ },
+ {
+  "name": "DB6",
+  "x": -1.8249999,
+  "y": 178.1,
+  "z": -0.2,
+  "types": [
+   "motor"
+  ],
+  "neurotransmitters": [
+   "Acetylcholine"
+  ]
+ },
+ {
+  "name": "AS8",
+  "x": -1.9,
+  "y": 181.85,
+  "z": -1.7750001,
+  "types": [
+   "motor"
+  ],
+  "neurotransmitters": [
+   "Acetylcholine"
+  ]
+ },
+ {
+  "name": "PVM",
+  "x": 24.85,
+  "y": 188.8,
+  "z": 20.550001,
+  "types": [
+   "sensory"
+  ],
+  "neurotransmitters": []
+ },
+ {
+  "name": "VD9",
+  "x": -0.8,
+  "y": 191.5,
+  "z": -3.8,
+  "types": [
+   "motor"
+  ],
+  "neurotransmitters": [
+   "GABA"
+  ]
+ },
+ {
+  "name": "DA6",
+  "x": -1.65,
+  "y": 198.675,
+  "z": -6.3500004,
+  "types": [
+   "motor"
+  ],
+  "neurotransmitters": [
+   "Acetylcholine"
+  ]
+ },
+ {
+  "name": "VA9",
+  "x": -1.8,
+  "y": 208.825,
+  "z": -9.049999,
+  "types": [
+   "motor"
+  ],
+  "neurotransmitters": [
+   "Acetylcholine"
+  ]
+ },
+ {
+  "name": "VB10",
+  "x": -1.85,
+  "y": 218.07498,
+  "z": -11.4,
+  "types": [
+   "motor",
+   "sensory"
+  ],
+  "neurotransmitters": [
+   "Acetylcholine"
+  ]
+ },
+ {
+  "name": "SDQL",
+  "x": 21.4,
+  "y": 222.79999,
+  "z": 19.2,
+  "types": [
+   "interneuron",
+   "sensory"
+  ],
+  "neurotransmitters": [
+   "Acetylcholine"
+  ]
+ },
+ {
+  "name": "AS9",
+  "x": -1.8750001,
+  "y": 228.92499,
+  "z": -14.5,
+  "types": [
+   "motor"
+  ],
+  "neurotransmitters": [
+   "Acetylcholine"
+  ]
+ },
+ {
+  "name": "DD5",
+  "x": -1.8750001,
+  "y": 234.05002,
+  "z": -15.775,
+  "types": [
+   "motor"
+  ],
+  "neurotransmitters": [
+   "GABA"
+  ]
+ },
+ {
+  "name": "VD10",
+  "x": -0.75,
+  "y": 236.1,
+  "z": -16.5,
+  "types": [
+   "motor"
+  ],
+  "neurotransmitters": [
+   "GABA"
+  ]
+ },
+ {
+  "name": "VA10",
+  "x": -1.85,
+  "y": 254.62502,
+  "z": -21.25,
+  "types": [
+   "motor"
+  ],
+  "neurotransmitters": [
+   "Acetylcholine"
+  ]
+ },
+ {
+  "name": "VB11",
+  "x": -1.8249999,
+  "y": 262.325,
+  "z": -21.95,
+  "types": [
+   "motor",
+   "sensory"
+  ],
+  "neurotransmitters": [
+   "Acetylcholine"
+  ]
+ },
+ {
+  "name": "DB7",
+  "x": -1.85,
+  "y": 267.75,
+  "z": -22.625,
+  "types": [
+   "motor"
+  ],
+  "neurotransmitters": [
+   "Acetylcholine"
+  ]
+ },
+ {
+  "name": "AS10",
+  "x": -1.9,
+  "y": 278.25,
+  "z": -24.0,
+  "types": [
+   "motor"
+  ],
+  "neurotransmitters": [
+   "Acetylcholine"
+  ]
+ },
+ {
+  "name": "DA7",
+  "x": -1.65,
+  "y": 281.6,
+  "z": -24.95,
+  "types": [
+   "motor"
+  ],
+  "neurotransmitters": [
+   "Acetylcholine"
+  ]
+ },
+ {
+  "name": "VD11",
+  "x": -0.8,
+  "y": 283.80002,
+  "z": -24.8,
+  "types": [
+   "motor"
+  ],
+  "neurotransmitters": [
+   "GABA"
+  ]
+ },
+ {
+  "name": "VA11",
+  "x": -1.55,
+  "y": 312.35,
+  "z": -26.249998,
+  "types": [
+   "motor"
+  ],
+  "neurotransmitters": [
+   "Acetylcholine"
+  ]
+ },
+ {
+  "name": "AS11",
+  "x": -1.8750001,
+  "y": 315.7,
+  "z": -26.124998,
+  "types": [
+   "motor"
+  ],
+  "neurotransmitters": [
+   "Acetylcholine"
+  ]
+ },
+ {
+  "name": "VD12",
+  "x": -0.75,
+  "y": 345.5,
+  "z": -23.15,
+  "types": [
+   "motor"
+  ],
+  "neurotransmitters": [
+   "GABA"
+  ]
+ },
+ {
+  "name": "PVPR",
+  "x": -0.15,
+  "y": 356.55,
+  "z": -16.65,
+  "types": [
+   "interneuron"
+  ],
+  "neurotransmitters": [
+   "Acetylcholine"
+  ]
+ },
+ {
+  "name": "PVT",
+  "x": -0.1,
+  "y": 358.75,
+  "z": -17.5,
+  "types": [
+   "interneuron"
+  ],
+  "neurotransmitters": []
+ },
+ {
+  "name": "VA12",
+  "x": -0.1,
+  "y": 362.45,
+  "z": -18.15,
+  "types": [
+   "motor"
+  ],
+  "neurotransmitters": [
+   "Acetylcholine"
+  ]
+ },
+ {
+  "name": "DD6",
+  "x": -1.9,
+  "y": 365.775,
+  "z": -16.475,
+  "types": [
+   "motor"
+  ],
+  "neurotransmitters": [
+   "GABA"
+  ]
+ },
+ {
+  "name": "PVPL",
+  "x": -0.1,
+  "y": 366.65002,
+  "z": -14.7,
+  "types": [
+   "interneuron"
+  ],
+  "neurotransmitters": [
+   "Acetylcholine"
+  ]
+ },
+ {
+  "name": "DA8",
+  "x": 1.275,
+  "y": 376.8,
+  "z": -10.925,
+  "types": [
+   "motor"
+  ],
+  "neurotransmitters": [
+   "Acetylcholine"
+  ]
+ },
+ {
+  "name": "DA9",
+  "x": -4.6,
+  "y": 376.8,
+  "z": -10.925,
+  "types": [
+   "motor"
+  ],
+  "neurotransmitters": [
+   "Acetylcholine"
+  ]
+ },
+ {
+  "name": "VD13",
+  "x": -0.75,
+  "y": 379.85,
+  "z": -10.75,
+  "types": [
+   "motor"
+  ],
+  "neurotransmitters": [
+   "GABA"
+  ]
+ },
+ {
+  "name": "PDB",
+  "x": -3.3,
+  "y": 384.65,
+  "z": -7.75,
+  "types": [
+   "interneuron",
+   "motor"
+  ],
+  "neurotransmitters": []
+ },
+ {
+  "name": "PDA",
+  "x": -2.95,
+  "y": 387.25,
+  "z": -5.5,
+  "types": [
+   "motor"
+  ],
+  "neurotransmitters": [
+   "Acetylcholine"
+  ]
+ },
+ {
+  "name": "DVB",
+  "x": -0.75,
+  "y": 394.5,
+  "z": 4.0,
+  "types": [
+   "interneuron",
+   "motor"
+  ],
+  "neurotransmitters": [
+   "GABA"
+  ]
+ },
+ {
+  "name": "DVA",
+  "x": -2.345,
+  "y": 394.6,
+  "z": 3.678,
+  "types": [
+   "interneuron",
+   "sensory"
+  ],
+  "neurotransmitters": [
+   "Acetylcholine"
+  ]
+ },
+ {
+  "name": "DVC",
+  "x": -0.116,
+  "y": 395.43298,
+  "z": 5.992,
+  "types": [
+   "interneuron"
+  ],
+  "neurotransmitters": [
+   "Glutamate"
+  ]
+ },
+ {
+  "name": "PLNL",
+  "x": 4.225,
+  "y": 402.3,
+  "z": 6.8999996,
+  "types": [
+   "interneuron",
+   "sensory"
+  ],
+  "neurotransmitters": [
+   "Acetylcholine"
+  ]
+ },
+ {
+  "name": "PLNR",
+  "x": -6.225,
+  "y": 402.3,
+  "z": 6.8999996,
+  "types": [
+   "interneuron",
+   "sensory"
+  ],
+  "neurotransmitters": [
+   "Acetylcholine"
+  ]
+ },
+ {
+  "name": "PVQL",
+  "x": 0.85,
+  "y": 402.40002,
+  "z": 5.15,
+  "types": [
+   "interneuron"
+  ],
+  "neurotransmitters": [
+   "Glutamate"
+  ]
+ },
+ {
+  "name": "PVQR",
+  "x": -3.3,
+  "y": 402.40002,
+  "z": 5.15,
+  "types": [
+   "interneuron"
+  ],
+  "neurotransmitters": [
+   "Glutamate"
+  ]
+ },
+ {
+  "name": "PHAL",
+  "x": 1.2,
+  "y": 402.9,
+  "z": 4.1,
+  "types": [
+   "sensory"
+  ],
+  "neurotransmitters": [
+   "Glutamate"
+  ]
+ },
+ {
+  "name": "PHAR",
+  "x": -3.8,
+  "y": 402.9,
+  "z": 4.1,
+  "types": [
+   "sensory"
+  ],
+  "neurotransmitters": [
+   "Glutamate"
+  ]
+ },
+ {
+  "name": "LUAL",
+  "x": 1.35,
+  "y": 403.80002,
+  "z": 4.1,
+  "types": [
+   "interneuron"
+  ],
+  "neurotransmitters": [
+   "Glutamate"
+  ]
+ },
+ {
+  "name": "LUAR",
+  "x": -3.85,
+  "y": 403.80002,
+  "z": 4.1,
+  "types": [
+   "interneuron"
+  ],
+  "neurotransmitters": [
+   "Glutamate"
+  ]
+ },
+ {
+  "name": "PVCL",
+  "x": 0.85,
+  "y": 404.15002,
+  "z": 5.5,
+  "types": [
+   "interneuron"
+  ],
+  "neurotransmitters": [
+   "Acetylcholine"
+  ]
+ },
+ {
+  "name": "PVCR",
+  "x": -3.4499998,
+  "y": 404.15002,
+  "z": 5.5,
+  "types": [
+   "interneuron"
+  ],
+  "neurotransmitters": [
+   "Acetylcholine"
+  ]
+ },
+ {
+  "name": "PVWL",
+  "x": 0.8,
+  "y": 405.4,
+  "z": 6.8,
+  "types": [
+   "interneuron"
+  ],
+  "neurotransmitters": [
+   "Acetylcholine"
+  ]
+ },
+ {
+  "name": "PVWR",
+  "x": -3.4,
+  "y": 405.4,
+  "z": 6.8,
+  "types": [
+   "interneuron"
+  ],
+  "neurotransmitters": [
+   "Acetylcholine"
+  ]
+ },
+ {
+  "name": "PHBL",
+  "x": 1.2,
+  "y": 405.60004,
+  "z": 5.475,
+  "types": [
+   "sensory"
+  ],
+  "neurotransmitters": [
+   "Glutamate",
+   "Serotonin"
+  ]
+ },
+ {
+  "name": "PHBR",
+  "x": -3.7250001,
+  "y": 405.60004,
+  "z": 5.475,
+  "types": [
+   "sensory"
+  ],
+  "neurotransmitters": [
+   "Glutamate",
+   "Serotonin"
+  ]
+ },
+ {
+  "name": "ALNL",
+  "x": 0.32500002,
+  "y": 406.69998,
+  "z": 12.375,
+  "types": [
+   "sensory"
+  ],
+  "neurotransmitters": [
+   "Acetylcholine"
+  ]
+ },
+ {
+  "name": "ALNR",
+  "x": -2.925,
+  "y": 406.69998,
+  "z": 12.375,
+  "types": [
+   "sensory"
+  ],
+  "neurotransmitters": [
+   "Acetylcholine"
+  ]
+ },
+ {
+  "name": "PQR",
+  "x": -0.32500002,
+  "y": 407.3,
+  "z": 7.6499996,
+  "types": [
+   "sensory"
+  ],
+  "neurotransmitters": [
+   "Glutamate"
+  ]
+ },
+ {
+  "name": "PVR",
+  "x": -1.85,
+  "y": 407.35,
+  "z": 7.7,
+  "types": [
+   "interneuron"
+  ],
+  "neurotransmitters": [
+   "Glutamate"
+  ]
+ },
+ {
+  "name": "PHCL",
+  "x": 0.75,
+  "y": 408.775,
+  "z": 7.275,
+  "types": [
+   "sensory"
+  ],
+  "neurotransmitters": [
+   "Glutamate"
+  ]
+ },
+ {
+  "name": "PHCR",
+  "x": -3.425,
+  "y": 408.775,
+  "z": 7.275,
+  "types": [
+   "sensory"
+  ],
+  "neurotransmitters": [
+   "Glutamate"
+  ]
+ },
+ {
+  "name": "PVNR",
+  "x": -3.25,
+  "y": 409.95,
+  "z": 8.900001,
+  "types": [
+   "interneuron",
+   "motor"
+  ],
+  "neurotransmitters": []
+ },
+ {
+  "name": "PVNL",
+  "x": 0.55,
+  "y": 410.0,
+  "z": 8.900001,
+  "types": [
+   "interneuron",
+   "motor"
+  ],
+  "neurotransmitters": []
+ },
+ {
+  "name": "PLML",
+  "x": 2.5,
+  "y": 410.15,
+  "z": 8.175,
+  "types": [
+   "sensory"
+  ],
+  "neurotransmitters": [
+   "Glutamate"
+  ]
+ },
+ {
+  "name": "PLMR",
+  "x": -3.675,
+  "y": 410.15,
+  "z": 8.175,
+  "types": [
+   "sensory"
+  ],
+  "neurotransmitters": [
+   "Glutamate"
+  ]
+ }
+]

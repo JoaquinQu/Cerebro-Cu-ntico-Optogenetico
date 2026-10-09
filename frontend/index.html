@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Cerebro Cuántico Optogenético</title>
+  <link rel="stylesheet" href="css/styles.css" />
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "./vendor/three/three.module.js",
+        "three/addons/": "./vendor/three/addons/"
+      }
+    }
+  </script>
+</head>
+<body>
+  <canvas id="scene"></canvas>
+
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-dot"></span>
+      <div>
+        <h1>Cerebro Cuántico Optogenético</h1>
+        <p>Quantum walk sobre el conectoma real de <em>C. elegans</em> · 302 neuronas</p>
+      </div>
+    </div>
+    <div class="status" id="status"><span class="pill" id="backend-pill">conectando…</span></div>
+  </header>
+
+  <!-- Panel izquierdo: láser y red completa -->
+  <aside class="panel left" id="panel-laser">
+    <section>
+      <h2><span class="step">1</span> Láser optogenético</h2>
+      <label class="field">
+        <span>Neurona iluminada</span>
+        <input id="neuron-input" list="neuron-list" value="AVM" autocomplete="off" spellcheck="false" />
+        <datalist id="neuron-list"></datalist>
+        <small class="hint">…o haz clic en una neurona del gusano</small>
+      </label>
+      <div class="neuron-card" id="neuron-card"></div>
+
+      <label class="field">
+        <span>Intensidad del pulso · θ = Ω·τ <b id="theta-val">π</b></span>
+        <input type="range" id="theta" min="0" max="3.14159" step="0.01" value="3.14159" />
+        <small class="hint">P(disparo) = sin²(θ/2) = <b id="pfire">1.00</b></small>
+      </label>
+      <label class="field">
+        <span>Acoplamiento γ <b id="gamma-val">1.0</b></span>
+        <input type="range" id="gamma" min="0.2" max="3" step="0.1" value="1" />
+      </label>
+      <label class="field">
+        <span>Duración de la simulación <b id="tmax-val">60</b></span>
+        <input type="range" id="tmax" min="10" max="200" step="5" value="60" />
+      </label>
+      <button class="btn primary" id="fire-btn">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2v6M12 16v6M2 12h6M16 12h6" /><circle cx="12" cy="12" r="3" /></svg>
+        Disparar láser
+      </button>
+    </section>
+
+    <section class="playback">
+      <div class="row">
+        <button class="icon-btn" id="play-btn" title="Reproducir / pausar" aria-label="Reproducir">
+          <svg viewBox="0 0 24 24" id="play-icon"><path d="M7 5l12 7-12 7z" /></svg>
+        </button>
+        <input type="range" id="timeline" min="0" max="1000" value="0" />
+        <span class="mono" id="time-label">t = 0.0</span>
+      </div>
+      <div class="row small">
+        <label class="toggle"><input type="checkbox" id="relative" checked /> escala relativa</label>
+        <label class="toggle"><input type="checkbox" id="show-edges" checked /> sinapsis</label>
+        <label class="toggle">velocidad
+          <select id="speed"><option value="0.5">0.5×</option><option value="1" selected>1×</option><option value="2">2×</option></select>
+        </label>
+      </div>
+      <div class="metrics">
+        <div><span class="k">Neuronas activas</span><span class="v" id="m-active">—</span></div>
+        <div><span class="k">Participación</span><span class="v" id="m-part">—</span></div>
+        <div><span class="k">Más probable</span><span class="v" id="m-top">—</span></div>
+      </div>
+      <ol class="toplist" id="toplist"></ol>
+    </section>
+  </aside>
+
+  <!-- Panel derecho: microcircuito en IonQ -->
+  <aside class="panel right" id="panel-ionq">
+    <section>
+      <h2><span class="step">2</span> Microcircuito en IonQ</h2>
+      <label class="field">
+        <span>Circuito</span>
+        <select id="preset"></select>
+      </label>
+      <p class="desc" id="preset-desc"></p>
+      <div class="seg" id="mode-seg" role="tablist">
+        <button data-mode="trotter" class="active" role="tab">Trotter</button>
+        <button data-mode="givens" role="tab">Givens</button>
+      </div>
+      <label class="field">
+        <span>Tiempo de evolución t <b id="tmicro-val">30</b></span>
+        <input type="range" id="tmicro" min="1" max="80" step="1" value="30" />
+      </label>
+      <button class="btn" id="compile-btn">Compilar y simular</button>
+
+      <div class="chips" id="chips"></div>
+      <div class="chart" id="bars"></div>
+      <div class="legend-row" id="bars-legend"></div>
+      <div class="chart small" id="series"></div>
+      <details class="circuit-box">
+        <summary>Circuito lógico <span class="mono" id="circ-count"></span></summary>
+        <div id="circuit"></div>
+      </details>
+    </section>
+
+    <section class="ionq">
+      <h3>Ejecutar en IonQ</h3>
+      <div class="row">
+        <select id="backend">
+          <option value="simulator">Simulador · ruido forte-1</option>
+          <option value="qpu.forte-1">QPU · Forte-1</option>
+          <option value="qpu.forte-enterprise-1">QPU · Forte Enterprise</option>
+        </select>
+        <input type="number" id="shots" value="1000" min="10" step="100" title="disparos" />
+      </div>
+      <div class="row">
+        <button class="btn" id="submit-btn">Enviar a IonQ</button>
+        <button class="btn ghost" id="export-btn" title="Descargar el JSON nativo para la API de IonQ">JSON</button>
+      </div>
+      <p class="hint" id="ionq-hint"></p>
+      <ul class="jobs" id="jobs"></ul>
+    </section>
+  </aside>
+
+  <footer class="footer">
+    <div class="formula">P<sub>k</sub>(t) = sin²(θ/2) · |⟨k| e<sup>−iγJt</sup> |j⟩|²</div>
+    <div class="legend">
+      <span><i class="dot sensory"></i>sensorial</span>
+      <span><i class="dot inter"></i>interneurona</span>
+      <span><i class="dot motor"></i>motora</span>
+      <span class="grad"><i></i>probabilidad de disparo</span>
+    </div>
+    <div class="credits">Datos: Cook et al. 2019 · OpenWorm · ejes transversales ×1.4</div>
+  </footer>
+
+  <div class="tooltip" id="tooltip"></div>
+  <div class="toast" id="toast"></div>
+  <div class="loader" id="loader"><div class="ring"></div><p>Cargando conectoma…</p></div>
+
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>
