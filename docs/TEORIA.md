@@ -34,7 +34,7 @@ Este documento explica la física y las decisiones técnicas detrás de `backend
 | Intensidad × duración del pulso | Ángulo de Rabi $\theta = \Omega\,\tau$ |
 | Probabilidad de disparo según la dosis de luz | $P(\text{disparo}) = \sin^2(\theta/2)$ |
 | La actividad viaja por las sinapsis | La excitación salta por los acoplamientos $J_{ij}$ |
-| Registro de calcio / electrofisiología | Medición en base $Z$: $|1\rangle$ = spike |
+| Registro de calcio / electrofisiología | Medición en base $Z$ : $|1 \rangle =$ spike |
 
 **Honestidad sobre la ventaja cuántica.** Con un solo láser, la dinámica vive en el sector de una excitación (dimensión $n$), que es clásicamente simulable en tiempo polinomial: así resolvemos las 302 neuronas. El hardware no "gana" aquí; demuestra la física. Con $k$ láseres simultáneos, el sector tiene dimensión $\binom{n}{k}$ y la exclusión (un qubit no admite dos excitaciones) introduce interacción efectiva (bosones de núcleo duro). Ahí la simulación clásica crece combinatoriamente y la evolución de Trotter en hardware es el camino natural (§10).
 
