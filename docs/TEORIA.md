@@ -73,7 +73,7 @@ Con esto el tiempo queda en unidades de $1/\gamma$, el tiempo de salto caracter�
 
 *Módulo:* `cerebro/hamiltonian.py` · *Test:* `tests/test_physics.py`
 
-Asignamos un qubit a cada neurona ($|0\rangle$ en reposo, $|1\rangle$ excitada) y definimos
+Asignamos un qubit a cada neurona ( $ |0\rangle $ en reposo, $ |1\rangle $ excitada ) y definimos
 
 $$
 H = \gamma \sum_{i<j} J_{ij}\,\frac{X_i X_j + Y_i Y_j}{2}
