@@ -105,7 +105,7 @@ def load_edges() -> list[tuple[str, str, int, str]]:
 
 
 def build_connectome(
-    weighting: Weighting = "log",
+    weighting: Weighting = "binary",
     include: tuple[str, ...] = ("chemical", "electrical"),
 ) -> Connectome:
     neurons = load_neurons()
@@ -154,6 +154,6 @@ def build_connectome(
 
 
 @lru_cache(maxsize=3)
-def get_connectome(weighting: Weighting = "log") -> Connectome:
+def get_connectome(weighting: Weighting = "binary") -> Connectome:
     """Conectoma cacheado (se construye una vez por tipo de peso)."""
     return build_connectome(weighting=weighting)
