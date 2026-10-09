@@ -76,8 +76,8 @@ Con esto el tiempo queda en unidades de $1/\gamma$, el tiempo de salto caracter�
 Asignamos un qubit a cada neurona ($|0\rangle$ en reposo, $|1\rangle$ excitada) y definimos
 
 $$
-H \;=\; \gamma \sum_{i<j} J_{ij}\,\frac{X_iX_j + Y_iY_j}{2}
-\;=\; \gamma \sum_{i<j} J_{ij}\left(\sigma_i^{+}\sigma_j^{-} + \sigma_i^{-}\sigma_j^{+}\right).
+H = \gamma \sum_{i<j} J_{ij}\,\frac{X_i X_j + Y_i Y_j}{2}
+= \gamma \sum_{i<j} J_{ij}\left(\sigma_i^{+}\sigma_j^{-} + \sigma_i^{-}\sigma_j^{+}\right).
 $$
 
 Es el modelo XY, o de bosones de núcleo duro, sobre el grafo del conectoma: cada término mueve una excitación de $j$ a $i$ con amplitud $\gamma J_{ij}$.
