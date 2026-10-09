@@ -44,6 +44,21 @@ def main():
         pag.screenshot(path=str(out / "2_backend_local.png"))
         print("estado SR:", pag.inner_text("#sr-status"))
 
+        # 1b) cascada cuántica: 6 pasos, cada uno un circuito en el backend
+        pag.fill("#casc-pasos", "6")
+        pag.click("#casc-btn")
+        pag.wait_for_function("document.querySelector('#casc-stop').disabled && "
+                              "document.querySelectorAll('#casc-log li').length > 0", timeout=120000)
+        print("cascada:", pag.inner_text("#casc-estado"))
+        pag.click("#cmp-box summary")
+        pag.click("#cmp-btn")
+        pag.wait_for_selector("#cmp-dist svg", timeout=60000)
+        pag.locator("#casc-bars").scroll_into_view_if_needed()
+        pag.wait_for_timeout(800)
+        pag.screenshot(path=str(out / "4_cascada.png"))
+        pag.locator("#cmp-dist").scroll_into_view_if_needed()
+        pag.screenshot(path=str(out / "5_comparacion.png"))
+
         # 2) Givens + otro preset
         pag.select_option("#preset", "toque-bilateral-10")
         pag.check('input[value="givens"]', force=True)
@@ -59,6 +74,8 @@ def main():
         pag.wait_for_selector("#run-result table", timeout=60000)
         assert pag.is_disabled("#run-btn"), "IonQ debería quedar en un job por ejecución"
         print("ionq: botón deshabilitado tras 1 job ✓")
+        assert pag.is_disabled("#casc-btn"), "la cascada también debe quedar bloqueada en IonQ"
+        print("ionq: cascada bloqueada tras el job ✓")
 
         # 4) hardware imitado: pide confirmación
         pag.goto(a.url + "/?backend=qpu")

@@ -167,6 +167,12 @@
 .qiskit-text { margin: 6px 0 0; max-height: 260px; overflow: auto; font: 10.5px/1.25 var(--mono); color: #cfe0ff;
   background: rgba(0,0,0,0.3); border-radius: 8px; padding: 8px; white-space: pre; }
 
+.cascade .row .btn { flex: 1; }
+.cascade .row input[type="number"] { width: 84px; }
+.casc-log { margin: 6px 0 0; padding-left: 22px; max-height: 180px; overflow-y: auto; font-size: 12px; color: var(--muted); }
+.casc-log li { padding: 1px 0; }
+.casc-log b { color: var(--text); }
+.casc-log .salto { color: var(--amber); }
 .run .result { margin-top: 10px; font-size: 12px; color: var(--muted); }
 .run .result b { color: var(--text); }
 .run .result code { font-family: var(--mono); font-size: 11px; color: var(--accent); word-break: break-all; }

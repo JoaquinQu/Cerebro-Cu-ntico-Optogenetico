@@ -106,6 +106,10 @@
 Este documento explica, con todas las demostraciones, la física detrás del proyecto. Cada una de las 302 neuronas de \emph{C.~elegans} se representa con un qubit. Las sinapsis reales del gusano definen un hamiltoniano de saltos tipo XY, y un pulso de luz (el ``láser optogenético'') es una rotación $\RX(\theta)$ sobre la neurona iluminada. Se demuestra que, con un láser, la dinámica es \emph{exactamente} un \emph{quantum walk} de tiempo continuo sobre el conectoma. De ahí sale el resultado central, $P_k(t)=\sin^2(\theta/2)\,\bigl|[\e^{-\ii\gamma J t}]_{kj}\bigr|^2$. Después se construye el circuito que lo simula: fórmulas de Trotter--Suzuki y su error, cascada de Givens, compilación a las compuertas nativas de IonQ, modelo de ruido, presupuesto de errores y mitigación por post-selección de simetría. Todas las cifras y figuras se calcularon con el mismo código del proyecto (\code{qollab/cerebro\_q}).
 \end{abstract}
 
+\begin{honestidad}
+\textbf{Nota de versión.} Este documento largo se escribió cuando el proyecto usaba pesos logarítmicos, $W_{ij}=\log(1+n_{ij})$. El equipo pasó después a pesos binarios (todas las sinapsis pesan igual). Las derivaciones valen igual para cualquier $J$ simétrica; las cifras concretas de este texto ($\lambda_{\max}$, TVD, fidelidades) corresponden a los pesos logarítmicos. Los valores actuales están en \code{teoria\_cerebro\_cuantico.tex}, y si se recompila este archivo las figuras saldrán ya con pesos binarios.
+\end{honestidad}
+
 \tableofcontents
 \newpage
 

@@ -6,7 +6,7 @@ This effort is supported by Qollab & IonQ.
 
 ## Qué se sube a Qollab
 
-Se suben solo estos archivos. Son 19 en total (17 sin README ni LICENSE) y pesan cerca de 1 MB, con lo que se respeta el límite de 100 archivos de 2 MB cada uno.
+Se suben solo estos archivos. Son 20 en total (18 sin README ni LICENSE) y pesan cerca de 1 MB, con lo que se respeta el límite de 100 archivos de 2 MB cada uno.
 
 ```
 index.html              cuerpo de la página (sin <script>, Qollab lo pega en <body>)
@@ -16,7 +16,7 @@ requirements.txt        numpy y scipy (Qiskit lo instala Qollab)
 js/escena.js            escena 3D (three 0.186, importado por nombre)
 js/graficos.js          gráficos SVG y tablas accesibles
 js/python.js            puente: .callPromising + JSON
-cerebro_q/              núcleo Python: datos, física, circuitos Qiskit, análisis, api
+cerebro_q/              núcleo Python: datos, física, circuitos Qiskit, cascada por ventanas, análisis, api
 data/neurons.json       posiciones de las 302 neuronas (OpenWorm)
 data/connectome_cook2019.csv   sinapsis (Cook et al. 2019)
 data/gusano.glb         cuerpo 3D (lo lee Python y lo entrega en base64)
@@ -42,8 +42,9 @@ Estas carpetas **no se suben**, porque son solo para desarrollo: `dev/` y `tests
 | Paso | Dónde corre | Qué hace |
 | --- | --- | --- |
 | 1 · Láser | Python (numpy) | Calcula el quantum walk exacto sobre las 302 neuronas: P<sub>k</sub>(t) = sin²(θ/2)·\|⟨k\|e<sup>−iγJt</sup>\|j⟩\|². No usa el backend. |
-| 2 · Microcircuito | Python + Qiskit | Arma un `QuantumCircuit` con RX(θ) (el láser) y RXX(α)·RYY(α) (el salto XY) por Trotter–Suzuki o con una cascada de Givens. Compara la teoría exacta, el circuito ideal y el circuito con ruido tipo Forte. |
-| 3 · Backend | `backend.run` | Hace **un** job con 1 o 4 circuitos (uno por tiempo t), transpilado con `optimization_level=1`. Mide los conteos, aplica post-selección por simetría (≤ 1 excitación) y calcula la TVD frente a la teoría. |
+| 2 · Cascada cuántica | Python + Qiskit + `backend.run` | Cada paso es un circuito de 10 qubits: la neurona que disparó y sus 9 vecinas con más sinapsis. Evolución XY con `PauliEvolutionGate` + `SuzukiTrotter` durante τ, **un job por paso**, medición. La neurona en 1 de un shot al azar dispara el paso siguiente. Incluye la comparación coherente / medido / cascada / clásica (efecto Zeno). |
+| 3 · Microcircuito | Python + Qiskit | Arma un `QuantumCircuit` con RX(θ) (el láser) y RXX(α)·RYY(α) (el salto XY) por Trotter–Suzuki o con una cascada de Givens. Compara la teoría exacta, el circuito ideal y el circuito con ruido tipo Forte. |
+| 3 · Backend del microcircuito | `backend.run` | Hace **un** job con 1 o 4 circuitos (uno por tiempo t), transpilado con `optimization_level=1`. Mide los conteos, aplica post-selección por simetría (≤ 1 excitación) y calcula la TVD frente a la teoría. |
 
 La teoría completa está en [`../docs/TEORIA.md`](../docs/TEORIA.md).
 
@@ -60,7 +61,7 @@ La teoría completa está en [`../docs/TEORIA.md`](../docs/TEORIA.md).
 
 ```bash
 cd qollab
-python -m unittest discover -s tests      # 15 pruebas (física, circuitos, reglas de Qollab)
+python -m unittest discover -s tests      # 20 pruebas (física, circuitos, cascada, reglas de Qollab)
 python dev/servidor.py                    # http://127.0.0.1:8765  (?backend=ionq | ?backend=qpu)
 python dev/prueba_navegador.py            # prueba de humo con Playwright (servidor encendido)
 ```
@@ -87,8 +88,9 @@ python dev/prueba_navegador.py            # prueba de humo con Playwright (servi
 1. Presiona **Run** y elige un backend. Con *Built-in simulator* todo es instantáneo y gratis.
 2. Elige una neurona en el panel 1 o haz clic sobre el gusano y presiona **Disparar láser**.
 3. En el panel 2, elige el microcircuito, el modo (Trotter o Givens) y el tiempo t.
-4. Presiona **Ejecutar circuito**. Se manda un solo job con 4 tiempos. Los puntos naranjos se comparan con las curvas teóricas y aparecen la TVD y la fracción aceptada.
-5. Para IonQ, elige *IonQ Forte 1* (simulador remoto, gratis). IonQ acepta un job por Run.
+4. En el panel 2, presiona **Iniciar cascada**. Cada paso es un circuito de 10 qubits ejecutado en el backend; el spike medido salta por el gusano y deja un rastro. Abre "¿Qué cambia al medir?" para ver cómo la medición frena el walk (efecto Zeno).
+5. Presiona **Ejecutar circuito**. Se manda un solo job con 4 tiempos. Los puntos naranjos se comparan con las curvas teóricas y aparecen la TVD y la fracción aceptada.
+6. Para IonQ, elige *IonQ Forte 1* (simulador remoto, gratis). IonQ acepta un job por Run: la cascada corre un paso.
 
 **Cómo replicarlo.** Todo el código y los datos están en este proyecto y en el repositorio público (MIT): https://github.com/JoaquinQu/Cerebro-Cu-ntico-Optogenetico. Las pruebas automáticas comprueban que la dinámica XY en un sector de una excitación coincide con el walk, que Trotter converge, que Givens es exacto y que la post-selección es correcta. La teoría completa está en `docs/TEORIA.md`.
 
@@ -99,15 +101,6 @@ python dev/prueba_navegador.py            # prueba de humo con Playwright (servi
 - orden de Trotter superior;
 - otros conectomas (por ejemplo, *Drosophila*);
 - estimar tiempos de llegada de la señal con hardware real.
-
-**Trabajo previo (divulgación).** Antes de la ventana del hackathon (9 oct. 2026, 20:00 CLT) el equipo preparó una base:
-
-- un prototipo con servidor Python, three.js y la API REST de IonQ;
-- la teoría;
-- el modelo 3D;
-- una primera versión de este port a Qiskit/Qollab.
-
-En el repositorio está marcada con la etiqueta `pre-hackathon`. Lo hecho durante la ventana se detalla en los commits posteriores.
 
 **Temas:** Quantum Unlocked · Quantum Playground.
 

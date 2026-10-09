@@ -1,6 +1,7 @@
 """Física exacta (docs/TEORIA.md §2–§4).
 
-    J = W / λ_max(W),   W_ij = log(1 + sinapsis químicas (ambos sentidos) + uniones gap)
+    J = W / λ_max(W),   W_ij = 1 si hay al menos una sinapsis (química en cualquier sentido o gap), 0 si no
+    (pesos binarios: decisión del equipo; todas las conexiones pesan lo mismo)
     H = γ Σ_{i<j} J_ij (X_i X_j + Y_i Y_j)/2        (modelo XY)
     Sector de una excitación:  H = γ J   ⇒  quantum walk
     Láser RX(θ) en la neurona j:  P_k(t) = sin²(θ/2) |[e^{-iγJt}]_kj|²
@@ -28,7 +29,7 @@ def acoplamientos() -> tuple[np.ndarray, list[str], float]:
         if a in idx and b in idx and a != b:
             (quim if tipo == "chemical" else gap)[idx[a], idx[b]] += w
     conteo = quim + quim.T + np.maximum(gap, gap.T)
-    W = np.log1p(conteo)
+    W = (conteo > 0).astype(float)  # binario: todas las sinapsis pesan igual
     np.fill_diagonal(W, 0.0)
     escala = float(np.max(np.abs(np.linalg.eigvalsh(W))))
     return W / escala, nombres, escala

@@ -11,7 +11,7 @@ import math
 
 import numpy as np
 
-from . import analisis, circuitos, datos, fisica
+from . import analisis, cascada, circuitos, datos, fisica
 from .microcircuitos import MICROCIRCUITOS
 
 
@@ -233,3 +233,29 @@ def ejecutar_json(backend, params_json: str) -> str:
         "ops_transpilado": ops_transpilado,
         "resultados": filas,
     })
+
+
+# ---------------------------------------------------------------------------
+# Cascada cuántica de spikes (quantum walk por ventanas)
+# ---------------------------------------------------------------------------
+def paso_json(backend, params_json: str) -> str:
+    """Un paso de la cascada = UN circuito de 10 qubits en UN job del backend elegido."""
+    p = json.loads(params_json or "{}")
+    centro = fisica.indice(p.get("centro", "AVM"))
+    out = cascada.ejecutar_paso(
+        backend, centro,
+        theta=float(p.get("theta", math.pi)), tau=float(p.get("tau", 8.0)), gamma=float(p.get("gamma", 1.0)),
+        shots=int(p.get("shots", 200)), pasos=int(p.get("pasos_trotter", 1)),
+        semilla=p.get("semilla"),
+    )
+    out["backend"] = _nombre_backend(backend)
+    return _json(out)
+
+
+def comparacion_json(params_json: str) -> str:
+    """Coherente vs medido cada τ vs cascada por ventanas vs clásico (numpy, sin backend)."""
+    p = json.loads(params_json or "{}")
+    centro = fisica.indice(p.get("centro", "AVM"))
+    return _json(cascada.comparacion(centro, tau=float(p.get("tau", 8.0)), pasos=int(p.get("pasos", 20)),
+                                     gamma=float(p.get("gamma", 1.0)),
+                                     trayectorias=int(p.get("trayectorias", 300))))

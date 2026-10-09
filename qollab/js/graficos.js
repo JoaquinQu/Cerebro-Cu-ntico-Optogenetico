@@ -67,18 +67,18 @@ export function groupedBars(container, labels, series, { height = 170, max = nul
 }
 
 /** Series temporales de poblaciones con marcador vertical en t */
-export function timeSeries(container, times, rows, labels, { marker = null, height = 120, colors = null, points = null } = {}) {
+export function timeSeries(container, times, rows, labels, { marker = null, height = 120, colors = null, points = null, ymax = 1, ariaLabel = null } = {}) {
   container.innerHTML = "";
   const W = 330, H = height, padL = 28, padB = 18, padT = 6;
   const svg = el("svg", { viewBox: `0 0 ${W} ${H}`, role: "img",
-    "aria-label": `Series temporales de la teoría exacta para ${labels.join(", ")}` }, container);
+    "aria-label": ariaLabel ?? `Series temporales de la teoría exacta para ${labels.join(", ")}` }, container);
   const tmax = times[times.length - 1] || 1;
   const plotW = W - padL - 6, plotH = H - padB - padT;
   const X = (t) => padL + (plotW * t) / tmax;
-  const Y = (v) => padT + plotH * (1 - v);
+  const Y = (v) => padT + plotH * (1 - v / ymax);
   const g = el("g", { class: "axis" }, svg);
   el("line", { x1: padL, x2: W - 6, y1: Y(0), y2: Y(0) }, g);
-  [0, 0.5, 1].forEach((v) => {
+  [0, ymax / 2, ymax].forEach((v) => {
     const t = el("text", { x: padL - 5, y: Y(v) + 3, "text-anchor": "end" }, g);
     t.textContent = v.toFixed(1);
   });
@@ -97,7 +97,7 @@ export function timeSeries(container, times, rows, labels, { marker = null, heig
   // Puntos medidos en el backend: points = [{t, values}] (mismo orden que labels)
   if (points) {
     points.forEach(({ t, values }) => values.forEach((v, k) => {
-      const c = el("circle", { cx: X(t), cy: Y(Math.min(1, v)), r: 2.8, fill: palette[k % palette.length],
+      const c = el("circle", { cx: X(t), cy: Y(Math.min(ymax, v)), r: 2.8, fill: palette[k % palette.length],
         stroke: "#04060c", "stroke-width": 1 }, svg);
       el("title", {}, c).textContent = `${labels[k]} medido en t=${t}: ${v.toFixed(3)}`;
     }));

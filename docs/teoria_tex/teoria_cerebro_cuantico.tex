@@ -241,24 +241,23 @@ con un frente que avanza a velocidad máxima $2\gamma$. Usando $\sum_xx^2\mathca
 \label{sec:conectoma}
 % =====================================================================
 
-Los datos son las sinapsis químicas ($c_{i\to j}$) y los contactos gap ($g_{ij}$) del hermafrodita adulto de Cook \emph{et al.}~\cite{cook2019}, distribuidos por OpenWorm~\cite{openworm}. Un hamiltoniano debe ser hermítico, así que la matriz de pesos tiene que ser simétrica. Se define
+Los datos son las sinapsis químicas ($c_{i\to j}$) y los contactos gap ($g_{ij}$) del hermafrodita adulto de Cook \emph{et al.}~\cite{cook2019}, distribuidos por OpenWorm~\cite{openworm}. Un hamiltoniano debe ser hermítico, así que la matriz de pesos tiene que ser simétrica. El proyecto usa \emph{pesos binarios}: dos neuronas están conectadas si tienen al menos una sinapsis química (en cualquier sentido) o un contacto gap, y todas las conexiones pesan lo mismo:
 \begin{equation}
-n_{ij}=c_{i\to j}+c_{j\to i}+\max(g_{ij},g_{ji}),
-\qquad
-W_{ij}=\log(1+n_{ij}),
+W_{ij}=\begin{cases}1 & \text{si } c_{i\to j}+c_{j\to i}+g_{ij}+g_{ji}>0,\\ 0 & \text{si no,}\end{cases}
 \qquad
 J=\frac{W}{\lambda_{\max}(W)} .
 \label{eq:J}
 \end{equation}
+$W$ es entonces la \emph{matriz de adyacencia} del conectoma, y el walk es el caso de libro: un CTQW sobre un grafo sin pesos.
 
 \begin{itemize}
-\item \textbf{Logaritmo.} Comprime la cola pesada de conteos sinápticos, para que unas pocas conexiones gruesas no dominen la dinámica.
+\item \textbf{Por qué binario.} Fue una decisión del equipo. Todas las sinapsis valen lo mismo, así que la propagación depende solo de la \emph{forma} de la red: quién está conectado con quién. La excitación salta de forma más pareja y la interferencia se reparte por más caminos. (Se puede usar en cambio $W_{ij}=\log(1+n_{ij})$ con $n_{ij}$ el número de sinapsis; el código del backend lo conserva como opción.)
 \item \textbf{Normalización.} Por el teorema de Perron--Frobenius, en una matriz simétrica no negativa el mayor valor propio es también el de mayor módulo. Así $\lVert J\rVert_2=1$, la escala más rápida de la red es $\gamma$ y el tiempo queda en unidades de $1/\gamma$.
-\item \textbf{Números.} $\lambda_{\max}(W)\approx60.2$; el espectro de $J$ está en $[-0.40,1]$; hay $3\,465$ pares conectados, con $J_{ij}\in[0.012,0.073]$. Un salto típico tarda $t\sim1/(\gamma J_{ij})\approx25/\gamma$.
+\item \textbf{Números.} $\lambda_{\max}(W)\approx32.8$; el espectro de $J$ está en $[-0.35,1]$; hay $3\,465$ pares conectados, todos con $J_{ij}=0.0305$. Un salto tarda del orden de $t\sim1/(\gamma J_{ij})\approx33/\gamma$.
 \end{itemize}
 
 \begin{honestidad}
-Al simetrizar se pierde la dirección de las sinapsis químicas: en el modelo la excitación puede viajar ``hacia atrás''.
+Se pierden dos datos biológicos: la dirección de las sinapsis químicas (en el modelo la excitación puede viajar ``hacia atrás'') y cuántas sinapsis tiene cada conexión (una sinapsis y cincuenta pesan igual).
 \end{honestidad}
 
 % =====================================================================
@@ -354,19 +353,19 @@ Las neuronas se encienden en capas según su distancia en el grafo, y dentro de 
 \mathrm{PR}(t)=\frac{1}{\sum_kP_k(t)^2}\;\approx\;\frac n2\approx151 .
 \end{equation}
 
-Se observa $\mathrm{PR}\approx140$, que fluctúa sin converger. La caminata clásica, en cambio, se acerca a $n$ (distribución uniforme). En cada instante el walk cuántico tiene la mitad de las neuronas ``encendidas'' y el resto en zonas oscuras de interferencia, y ese patrón cambia todo el tiempo.
+Se observa $\mathrm{PR}\approx130$--$150$, que fluctúa sin converger. La caminata clásica, en cambio, se acerca a $n$ (distribución uniforme). En cada instante el walk cuántico tiene la mitad de las neuronas ``encendidas'' y el resto en zonas oscuras de interferencia, y ese patrón cambia todo el tiempo.
 
 \paragraph{En promedio, el walk recuerda dónde empezó.} Si los vectores propios del conectoma se comportan como vectores reales aleatorios de varianza $1/n$, entonces $\mathbb E[V_{jm}^4]=3/n^2$ y, por \eqref{eq:promedio},
 \begin{equation}
 \overline{P_j}=\sum_mV_{jm}^4\approx\frac3n .
 \end{equation}
 
-Para AVM se obtiene $\overline{P_j}=2.8/n$: en promedio, la excitación pasa casi el triple de tiempo en la neurona iluminada que en una neurona cualquiera. La caminata clásica tiende a $1/n$ y olvida. Este exceso de retorno es un efecto puramente de interferencia: los caminos que salen y vuelven por la misma ruta en sentidos opuestos llegan con la misma fase y se suman.
+Para AVM se obtiene $\overline{P_j}=3.7/n$: en promedio, la excitación pasa casi cuatro veces más tiempo en la neurona iluminada que en una neurona cualquiera, algo más que la estimación aleatoria. La caminata clásica tiende a $1/n$ y olvida. Este exceso de retorno es un efecto puramente de interferencia: los caminos que salen y vuelven por la misma ruta en sentidos opuestos llegan con la misma fase y se suman.
 
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=\textwidth]{figuras/fig_retorno.pdf}
-\caption{Conectoma completo, láser en AVM. Izquierda: participación efectiva; la clásica tiende a $n$ (uniforme) y la cuántica fluctúa cerca de $n/2$. Derecha: probabilidad de retorno a AVM multiplicada por $n$, en escala logarítmica. La clásica tiende a $1$ (sin memoria) y la cuántica oscila alrededor de su promedio, $2.8\approx3$.}
+\caption{Conectoma completo, láser en AVM. Izquierda: participación efectiva; la clásica tiende a $n$ (uniforme) y la cuántica fluctúa cerca de $n/2$. Derecha: probabilidad de retorno a AVM multiplicada por $n$, en escala logarítmica. La clásica tiende a $1$ (sin memoria) y la cuántica oscila alrededor de su promedio, $3.7$.}
 \label{fig:retorno}
 \end{figure}
 
@@ -397,13 +396,13 @@ En \code{toque-6} con $r=2$ son $29$ saltos, es decir $58$ compuertas de dos qub
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=\textwidth]{figuras/fig_toque6.pdf}
-\caption{Walk exacto en \code{toque-6} desde AVM (líneas) y circuito de Trotter con $r=2$ (puntos). Se ve la excitación salir de AVM, pasar por ALML y concentrarse en la interneurona de mando AVAL hacia $t\approx27$. El acuerdo se degrada a tiempos largos porque, con $r$ fijo, el paso $\delta=t/r$ crece.}
+\caption{Walk exacto en \code{toque-6} desde AVM (líneas) y circuito de Trotter con $r=2$ (puntos). Se ve la excitación salir de AVM, pasar por ALML, AVDL y PVCL hacia $t\approx20$--$26$ y concentrarse en la interneurona de mando AVAL hacia $t\approx41$. El acuerdo se degrada a tiempos largos porque, con $r$ fijo, el paso $\delta=t/r$ crece.}
 \label{fig:toque6}
 \end{figure}
 
 \paragraph{Givens.} Como el walk de una excitación se calcula clásicamente, también se puede \emph{preparar} su resultado con solo $n-1$ saltos, eligiendo los ángulos para repartir los módulos $|\psi_k|$ uno a uno~\cite{kivlichan2018}. Es exacto y poco profundo, pero no es simulación: necesita conocer la respuesta.
 
-\paragraph{Conservación como control de errores.} Con un láser, ninguna medición ideal puede tener más de una neurona encendida (\cref{prop:conservacion}). Los shots que violan esa regla son errores y se descartan (post-selección por simetría~\cite{bonet2018}). En simulación con ruido tipo IonQ Forte, eso baja el error de \code{toque-6} a la mitad. Los detalles de compilación, ruido y mitigación están en \code{teoria\_extendida.tex}.
+\paragraph{Conservación como control de errores.} Con un láser, ninguna medición ideal puede tener más de una neurona encendida (\cref{prop:conservacion}). Los shots que violan esa regla son errores y se descartan (post-selección por simetría~\cite{bonet2018}). En simulación con ruido tipo IonQ Forte, eso baja el error de \code{toque-6} de $0.17$ a $0.05$ (TVD). Los detalles de compilación, ruido y mitigación están en \code{teoria\_extendida.tex}.
 
 % =====================================================================
 \section{Extensiones}

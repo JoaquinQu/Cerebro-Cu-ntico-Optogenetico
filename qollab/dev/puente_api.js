@@ -22,3 +22,5 @@ export const microcircuitos_json = fn("microcircuitos_json");
 export const simular_json = fn("simular_json");
 export const backend_json = fn("backend_json");
 export const ejecutar_json = fn("ejecutar_json");
+export const paso_json = fn("paso_json");
+export const comparacion_json = fn("comparacion_json");

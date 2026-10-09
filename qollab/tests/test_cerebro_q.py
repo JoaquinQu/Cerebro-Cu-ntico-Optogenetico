@@ -21,7 +21,7 @@ os.chdir(RAIZ)  # las rutas de datos son relativas a la raíz del proyecto, igua
 
 import numpy as np
 
-from cerebro_q import analisis, api, circuitos, fisica
+from cerebro_q import analisis, api, cascada, circuitos, fisica
 
 
 def backend_de_prueba():
@@ -107,6 +107,62 @@ class TestApiQollab(unittest.TestCase):
             name = "ionq_qpu.forte-1"
         info = json.loads(api.backend_json(FalsoIonQ()))
         self.assertTrue(info["ionq"] and info["hardware"])
+
+
+class TestCascada(unittest.TestCase):
+    """Quantum walk por ventanas (docs/PLAN_WALK_VENTANAS.md)."""
+
+    def test_ventana(self):
+        J, nombres, _ = fisica.acoplamientos()
+        for nombre in ("AVM", "ASHL", "DA1"):
+            c = fisica.indice(nombre)
+            w = cascada.ventana(c)
+            self.assertEqual(len(w), 10)
+            self.assertEqual(w[0], c)
+            self.assertEqual(len(set(w)), 10)
+            self.assertEqual(w, cascada.ventana(c))  # determinista
+            vecinas = set(np.nonzero(J[c])[0])
+            for j in w[1:]:  # vecina directa, o a distancia 2 si faltan
+                self.assertTrue(j in vecinas or any(J[v, j] > 0 for v in w[1:] if v in vecinas))
+
+    def test_circuito_paso_igual_a_teoria(self):
+        J, _, _ = fisica.acoplamientos()
+        w = cascada.ventana(fisica.indice("AVM"))
+        Js = J[np.ix_(w, w)]
+        exacta = fisica.distribucion_exacta(Js, [0], math.pi, 5.0, 1.0)
+        ops = cascada.operaciones_paso(Js, math.pi, 5.0, 1.0, 2)
+        self.assertLess(analisis.tvd(exacta, circuitos.probabilidades_ideales(ops, 10)), 0.01)
+        qc, metodo = cascada.circuito_paso(Js, math.pi, 5.0, 1.0, 2)
+        if REAL:  # Qiskit real: PauliEvolutionGate + SuzukiTrotter debe dar lo mismo
+            from qiskit.quantum_info import Statevector
+            self.assertEqual(metodo, "pauli_evolution")
+            sv = Statevector.from_instruction(qc.remove_final_measurements(inplace=False))
+            self.assertLess(analisis.tvd(exacta, sv.probabilities()), 0.01)
+
+    def test_paso_en_backend(self):
+        r = json.loads(api.paso_json(backend_de_prueba(), json.dumps(
+            {"centro": "AVM", "tau": 5, "shots": 400, "pasos_trotter": 2, "semilla": 3})))
+        self.assertEqual(r["centro"], "AVM")
+        self.assertEqual(len(r["ventana"]), 10)
+        self.assertIn(r["spike"], r["ventana"])
+        self.assertAlmostEqual(sum(r["medida"]), 1.0, places=6)
+        self.assertAlmostEqual(r["fraccion_valida"], 1.0, places=6)  # backend ideal
+        self.assertLess(0.5 * sum(abs(a - b) for a, b in zip(r["medida"], r["teoria_circuito"])), 0.15)
+
+    def test_paso_sin_disparo(self):
+        r = json.loads(api.paso_json(backend_de_prueba(), json.dumps(
+            {"centro": "AVM", "tau": 5, "theta": 0.0, "shots": 50, "semilla": 1})))
+        self.assertIsNone(r["spike"])
+        self.assertEqual(r["motivo_fin"], "vacio")
+
+    def test_comparacion(self):
+        c = json.loads(api.comparacion_json(json.dumps({"centro": "AVM", "tau": 2, "pasos": 10, "trayectorias": 50})))
+        cur = c["curvas"]
+        for k in ("coherente", "medido", "ventanas", "clasico"):
+            self.assertEqual(len(cur[k]["origen"]), 11)
+            self.assertAlmostEqual(cur[k]["origen"][0], 1.0, places=6)
+        # Efecto Zeno: medido cada τ = 2 se queda más en el origen que el walk coherente
+        self.assertGreater(cur["medido"]["origen"][5], cur["coherente"]["origen"][5])
 
 
 class TestReglasQollab(unittest.TestCase):

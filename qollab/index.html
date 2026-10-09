@@ -46,7 +46,8 @@
       </div>
 
       <div class="card playback">
-        <h3 id="h-play">Propagación</h3>
+        <h3 id="h-play">Propagación · teoría exacta</h3>
+        <p class="hint">El gusano completo se calcula de forma exacta y clásica: con un láser, los 302 qubits se reducen a una matriz de 302 × 302. La parte en qubits está en el panel 2.</p>
         <div class="row">
           <button type="button" class="icon-btn" id="play-btn" aria-label="Reproducir" aria-pressed="false">
             <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" id="play-icon"><path d="M7 5l12 7-12 7z" /></svg>
@@ -100,10 +101,58 @@
       <div class="loader" id="loader" role="status"><div class="ring" aria-hidden="true"></div><p id="loader-text">Cargando el conectoma…</p></div>
     </div>
 
-    <!-- 2 · Microcircuito en qubits -->
-    <section class="panel right" id="panel-q" aria-labelledby="h-micro">
+    <!-- 2 · Cascada cuántica: cada paso es un circuito de Qiskit -->
+    <section class="panel right" id="panel-q" aria-labelledby="h-casc">
+      <div class="card cascade">
+        <h2 id="h-casc"><span class="step" aria-hidden="true">2</span> Cascada cuántica de spikes</h2>
+        <p class="desc">Cada paso es un <b>circuito de Qiskit de 10 qubits</b>: la neurona que disparó y sus 9 vecinas con más sinapsis.
+          Se ejecuta en el backend elegido, se mide, y la neurona que sale en 1 dispara el paso siguiente.</p>
+        <div class="field">
+          <label for="tau">Tiempo por paso τ <b id="tau-val">8</b></label>
+          <input type="range" id="tau" min="2" max="12" step="1" value="8" aria-describedby="tau-hint" />
+          <small class="hint" id="tau-hint">τ chico: la ventana representa mejor la red, pero medir tan seguido congela el walk (efecto Zeno).
+            τ grande: la excitación se mueve más, pero se escapa de la ventana.</small>
+        </div>
+        <div class="row">
+          <label class="toggle" for="casc-pasos">pasos</label>
+          <input type="number" id="casc-pasos" value="20" min="1" max="60" step="1" />
+          <label class="toggle" for="casc-shots">shots</label>
+          <input type="number" id="casc-shots" value="200" min="20" max="2000" step="20" />
+        </div>
+        <div class="row">
+          <button type="button" class="btn primary" id="casc-btn">Iniciar cascada desde AVM</button>
+          <button type="button" class="btn ghost" id="casc-stop" disabled>Detener</button>
+        </div>
+        <p class="hint" id="casc-estado" aria-live="polite">La cascada parte de la neurona iluminada en el panel 1.</p>
+        <div class="chips" id="casc-chips"></div>
+        <figure class="chart">
+          <div id="casc-bars"></div>
+          <figcaption class="legend-row" id="casc-legend"></figcaption>
+        </figure>
+        <details class="data-box">
+          <summary>Ver la ventana como tabla</summary>
+          <div id="casc-table"></div>
+        </details>
+        <details class="data-box" open>
+          <summary>Cadena de spikes</summary>
+          <ol class="casc-log" id="casc-log"></ol>
+        </details>
+        <details class="data-box" id="cmp-box">
+          <summary>¿Qué cambia al medir? Coherente · medido · clásico</summary>
+          <p class="hint">Mismo láser y mismo τ. El walk <b>coherente</b> no se mide; el <b>medido</b> se mide cada τ en la red completa;
+            la <b>cascada</b> es lo que hacen estos circuitos de 10 qubits; la <b>clásica</b> es una caminata aleatoria común.
+            Al medir se pierde la interferencia entre pasos y, con τ chico, el walk se congela.</p>
+          <button type="button" class="btn" id="cmp-btn">Calcular comparación</button>
+          <figure class="chart small"><div id="cmp-dist"></div><figcaption class="hint">Distancia media al origen, en sinapsis.</figcaption></figure>
+          <figure class="chart small"><div id="cmp-orig"></div><figcaption class="hint">Probabilidad de seguir en la neurona de origen.</figcaption></figure>
+          <div class="legend-row" id="cmp-legend"></div>
+          <details class="data-box"><summary>Ver como tabla</summary><div id="cmp-table"></div></details>
+        </details>
+      </div>
+
+      <!-- 3 · Microcircuito fijo en qubits -->
       <div class="card">
-        <h2 id="h-micro"><span class="step" aria-hidden="true">2</span> Microcircuito en qubits</h2>
+        <h2 id="h-micro"><span class="step" aria-hidden="true">3</span> Microcircuito en qubits</h2>
         <div class="field">
           <label for="preset">Circuito</label>
           <select id="preset" aria-describedby="preset-desc"></select>

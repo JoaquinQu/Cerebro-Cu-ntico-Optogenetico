@@ -297,6 +297,23 @@ export class WormScene {
     if (this.activity !== undefined) this.setActivity(this.activity);
   }
 
+  /** Rastro de la cascada: línea que une los centros sucesivos (índices de neuronas). */
+  setTrail(indices) {
+    if (this.trail) {
+      this.scene.remove(this.trail);
+      this.trail.geometry.dispose();
+      this.trail.material.dispose();
+      this.trail = null;
+    }
+    if (indices && indices.length >= 2) {
+      const g = new THREE.BufferGeometry().setFromPoints(indices.map((i) => this.positions[i]));
+      this.trail = new THREE.Line(g, new THREE.LineBasicMaterial({ color: new THREE.Color("#ffb347").multiplyScalar(1.4),
+        transparent: true, opacity: 0.95, toneMapped: false, depthWrite: false }));
+      this.scene.add(this.trail);
+    }
+    this.requestRender();
+  }
+
   _buildLabel() {
     this.labelEl = document.createElement("div");
     Object.assign(this.labelEl.style, {

@@ -43,7 +43,7 @@ except ImportError:
 from cerebro_q import api  # noqa: E402
 
 FUNCIONES = {"conectoma_json", "walk_json", "cuerpo_glb", "microcircuitos_json", "simular_json",
-             "backend_json", "ejecutar_json"}
+             "backend_json", "ejecutar_json", "paso_json", "comparacion_json"}
 
 
 def crear_backend(tipo: str):
@@ -136,7 +136,7 @@ class Manejador(SimpleHTTPRequestHandler):
         try:
             args = json.loads(self.rfile.read(int(self.headers.get("Content-Length", 0))) or b"[]")
             args = [crear_backend(tipo) if a == "__backend__" else a for a in args]
-            if nombre in ("backend_json", "ejecutar_json") and tipo == "none":
+            if nombre in ("backend_json", "ejecutar_json", "paso_json") and tipo == "none":
                 raise RuntimeError("sin backend")
             salida = getattr(api, nombre)(*args)
             self._enviar(200, salida.encode("utf-8"), "application/json; charset=utf-8")

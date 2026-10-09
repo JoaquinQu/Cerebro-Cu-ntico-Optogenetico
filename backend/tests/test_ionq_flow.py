@@ -35,7 +35,7 @@ class TestIonQFlow(unittest.TestCase):
             rec = experiment.refresh_record(self.client, rec["job_id"])
             self.assertEqual(rec["status"], "completed")
             a = rec["analysis"]
-            tol = 1e-6 if mode == "givens" else 0.05  # el mock es ideal: sólo queda error de Trotter
+            tol = 1e-5 if mode == "givens" else 0.05  # el mock es ideal: sólo queda error de Trotter (Givens: redondeo)
             self.assertLess(a["tvd_raw"], tol)
             self.assertAlmostEqual(a["accepted_fraction"], 1.0, places=6)
 

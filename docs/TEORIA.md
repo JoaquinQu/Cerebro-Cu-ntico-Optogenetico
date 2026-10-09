@@ -34,7 +34,7 @@ Este documento explica la física y las decisiones técnicas detrás de `backend
 | Intensidad × duración del pulso | Ángulo de Rabi $\theta = \Omega\,\tau$ |
 | Probabilidad de disparo según la dosis de luz | $P(\text{disparo}) = \sin^2(\theta/2)$ |
 | La actividad viaja por las sinapsis | La excitación salta por los acoplamientos $J_{ij}$ |
-| Registro de calcio / electrofisiología | Medición en base $Z$ : $|1 \rangle =$ spike |
+| Registro de calcio / electrofisiología | Medición en base $Z$: $|1\rangle$ = spike |
 
 **Honestidad sobre la ventaja cuántica.** Con un solo láser, la dinámica vive en el sector de una excitación (dimensión $n$), que es clásicamente simulable en tiempo polinomial: así resolvemos las 302 neuronas. El hardware no "gana" aquí; demuestra la física. Con $k$ láseres simultáneos, el sector tiene dimensión $\binom{n}{k}$ y la exclusión (un qubit no admite dos excitaciones) introduce interacción efectiva (bosones de núcleo duro). Ahí la simulación clásica crece combinatoriamente y la evolución de Trotter en hardware es el camino natural (§10).
 
@@ -50,14 +50,13 @@ Este documento explica la física y las decisiones técnicas detrás de `backend
 - Posición 3D del soma y clasificación (sensorial / interneurona / motora) de **OpenWorm CElegansNeuroML**: 302 neuronas, eje anteroposterior de −312 a 410 µm.
 - Sólo CANL/CANR quedan aisladas, porque no tienen sinapsis en el conjunto de datos.
 
-**Simetrización.** Un hamiltoniano debe ser hermítico. Para el par $(i,j)$ con $c_{i\to j}$ sinapsis químicas y $g_{ij}$ contactos gap se define
+**Simetrización y pesos binarios.** Un hamiltoniano debe ser hermítico, así que $J$ tiene que ser simétrica. El proyecto usa **pesos binarios** (decisión del equipo): dos neuronas están conectadas si tienen al menos una sinapsis química, en cualquier sentido, o un contacto gap, y todas las conexiones pesan lo mismo:
 
 $$
-n_{ij} = c_{i\to j} + c_{j\to i} + \max(g_{ij}, g_{ji}),\qquad
-W_{ij} = \log(1 + n_{ij}).
+W_{ij} = \begin{cases} 1 & \text{si } c_{i\to j} + c_{j\to i} + g_{ij} + g_{ji} > 0 \\ 0 & \text{si no} \end{cases}
 $$
 
-El logaritmo comprime la cola pesada de conteos sinápticos, para que pocas conexiones muy gruesas no dominen la dinámica. También están disponibles `binary` (1 si existe conexión) y `count` (conteo crudo). **Limitación:** la dirección de la sinapsis química se pierde (§10).
+$W$ es la matriz de adyacencia del conectoma, y la propagación depende solo de quién está conectado con quién. El backend conserva las opciones `log` ($\log(1+n_{ij})$, que pesa por número de sinapsis) y `count`. **Limitaciones:** se pierden la dirección de la sinapsis química (§10) y el número de sinapsis de cada conexión.
 
 **Normalización espectral.**
 
@@ -65,7 +64,7 @@ $$
 J = \frac{W}{\lambda_{\max}(W)},\qquad \|J\|_2 = 1 .
 $$
 
-Con esto el tiempo queda en unidades de $1/\gamma$, el tiempo de salto característico del nodo más conectado. Para el peso `log`, $\lambda_{\max}(W) \approx 60.2$, y en el circuito de toque $J_{ij}\in[0.027, 0.064]$. Un microcircuito usa **la misma escala global**: $J_{\text{sub}} = J[S,S]$. Así su hamiltoniano es literalmente la restricción del de la red completa. Al restringir, el microcircuito se trata como **aislado**: se ignoran sus acoplamientos con las otras ~290 neuronas. Por eso su dinámica no coincide con la de esas mismas neuronas dentro de la red completa; es un modelo del circuito de toque por sí solo, igual que en los experimentos que lo estudian aislado.
+Con esto el tiempo queda en unidades de $1/\gamma$. Con pesos binarios, $\lambda_{\max}(W) \approx 32.8$ y toda conexión vale $J_{ij} \approx 0.0305$. Un microcircuito usa **la misma escala global**: $J_{\text{sub}} = J[S,S]$. Así su hamiltoniano es literalmente la restricción del de la red completa. Al restringir, el microcircuito se trata como **aislado**: se ignoran sus acoplamientos con las otras ~290 neuronas. Por eso su dinámica no coincide con la de esas mismas neuronas dentro de la red completa; es un modelo del circuito de toque por sí solo, igual que en los experimentos que lo estudian aislado.
 
 ---
 
@@ -73,11 +72,12 @@ Con esto el tiempo queda en unidades de $1/\gamma$, el tiempo de salto caracter�
 
 *Módulo:* `cerebro/hamiltonian.py` · *Test:* `tests/test_physics.py`
 
-Asignamos un qubit a cada neurona ( $|0\rangle$ en reposo, $|1\rangle$ excitada ) y definimos
+Asignamos un qubit a cada neurona ($|0\rangle$ en reposo, $|1\rangle$ excitada) y definimos
 
-
-$$H = \gamma \sum_{i<j} J_{ij}\,\frac{X_i X_j + Y_i Y_j}{2}
-= \gamma \sum_{i<j} J_{ij}\left(\sigma_i^{+}\sigma_j^{-} + \sigma_i^{-}\sigma_j^{+}\right).$$
+$$
+H \;=\; \gamma \sum_{i<j} J_{ij}\,\frac{X_iX_j + Y_iY_j}{2}
+\;=\; \gamma \sum_{i<j} J_{ij}\left(\sigma_i^{+}\sigma_j^{-} + \sigma_i^{-}\sigma_j^{+}\right).
+$$
 
 Es el modelo XY, o de bosones de núcleo duro, sobre el grafo del conectoma: cada término mueve una excitación de $j$ a $i$ con amplitud $\gamma J_{ij}$.
 
@@ -107,7 +107,7 @@ $$
 
 lo que cuesta $O(N^2)$ por fotograma. La animación de 120 fotogramas de la red completa se calcula en milisegundos (`walk_amplitudes`).
 
-**Qué se ve.** A diferencia de una difusión clásica, el walk avanza de forma balística (la dispersión crece $\propto t$) y presenta interferencia: hay neuronas que se encienden y se apagan, y zonas que quedan oscuras porque las amplitudes de distintos caminos se cancelan. Desde AVM, la excitación alcanza ALML en $t\approx5.5$ y AVDL en $t\approx6.5$. Hacia $t = 60$ está repartida en una "participación efectiva" $1/\sum_k q_k^2 \approx 130$ neuronas.
+**Qué se ve.** El walk presenta interferencia: hay neuronas que se encienden y se apagan, y zonas que quedan oscuras porque las amplitudes de distintos caminos se cancelan. En una cadena avanzaría de forma balística (dispersión $\propto t$), pero el conectoma es un grafo de mundo pequeño: lo que distingue al walk es que nunca se estabiliza y recuerda su origen. Hacia $t = 60$ está repartido en una "participación efectiva" $1/\sum_k q_k^2 \approx 130$ neuronas, contra $\approx 285$ de la difusión clásica (detalles en `docs/teoria_tex/`).
 
 ---
 
@@ -269,14 +269,14 @@ Hay dos fuentes de error que compiten:
 - **Algorítmico** (Trotter): disminuye con más pasos, $\varepsilon_T(r) = O(t^3/r^2)$.
 - **Hardware**: aumenta con el número de compuertas. A primer orden, la probabilidad de que ninguna falle es $F_{hw}(r) \approx f_{2q}^{\,N_{ZZ}(r)}\,f_{1q}^{\,N_{1q}(r)}$, con $f_{2q}=0.996$ y $f_{1q}=0.9998$ (Forte).
 
-El backend elige $r^* = \arg\min_r\big[\mathrm{TVD}_{\text{Trotter}}(r) + (1 - F_{hw}(r))\big]$, calculando el primer término exactamente para el microcircuito. Resultado para $t = 30$, láser $\theta=\pi$ en AVM (salida de `resource_report.py`):
+El backend elige $r^* = \arg\min_r\big[\mathrm{TVD}_{\text{Trotter}}(r) + (1 - F_{hw}(r))\big]$, calculando el primer término exactamente para el microcircuito. Resultado para $t = 30$, láser $\theta=\pi$ en AVM, con pesos binarios (salida de `resource_report.py`):
 
 | Microcircuito | qubits | sinapsis | $r^*$ | ZZ (Trotter) | GPi2 | $F_{hw}$ | TVD Trotter | ZZ (Givens) | $F_{hw}$ Givens |
 |---|---|---|---|---|---|---|---|---|---|
-| toque-6 | 6 | 8 | 2 | 58 | 122 | 0.77 | 0.093 | 10 | 0.96 |
-| toque-7 | 7 | 11 | 2 | 82 | 171 | 0.70 | 0.179 | 12 | 0.95 |
-| toque-bilateral-10 | 10 | 25 | 1 | 98 | 206 | 0.65 | 0.262 | 18 | 0.92 |
-| toque-14 | 14 | 44 | 1 | 174 | 362 | 0.46 | 0.412 | 26 | 0.89 |
+| toque-6 | 6 | 8 | 2 | 58 | 122 | 0.77 | 0.027 | 10 | 0.96 |
+| toque-7 | 7 | 11 | 2 | 82 | 171 | 0.70 | 0.062 | 12 | 0.95 |
+| toque-bilateral-10 | 10 | 25 | 2 | 194 | 398 | 0.42 | 0.172 | 18 | 0.92 |
+| toque-14 | 14 | 44 | 1 | 174 | 362 | 0.46 | 0.337 | 26 | 0.89 |
 
 **Lectura:**
 
@@ -291,7 +291,7 @@ El estimador es estratificado. El término sin errores, de peso $P_0=\prod_i(1-p
 
 ## 8. Mitigación de errores y protocolo experimental
 
-1. **Post-selección por simetría** (Bonet-Monroig et al. 2018; McArdle et al. 2019). Se descartan los disparos con más excitaciones que láseres y se renormaliza (`analysis.postselect`). En el simulador local con ruido Forte, para `toque-6`, la TVD respecto de la teoría baja de 0,24 a 0,12 tras post-seleccionar. Este procedimiento es exactamente el que IonQ recomienda como *symmetry-based post-selection* en su guía de buenas prácticas.
+1. **Post-selección por simetría** (Bonet-Monroig et al. 2018; McArdle et al. 2019). Se descartan los disparos con más excitaciones que láseres y se renormaliza (`analysis.postselect`). En el simulador local con ruido Forte, para `toque-6`, la TVD respecto de la teoría baja de 0,17 a 0,05 tras post-seleccionar. Este procedimiento es exactamente el que IonQ recomienda como *symmetry-based post-selection* en su guía de buenas prácticas.
 2. **Mismo número de pasos de Trotter en todos los tiempos.** IonQ lo recomienda porque deja un error experimental homogéneo, más fácil de corregir. El script de experimento lo impone (`--steps` fijo).
 3. **Debiasing de IonQ.** El servidor puede generar variantes simétricas del circuito y agregarlas; queda disponible vía `settings.error_mitigation` en la API.
 4. **Validación cruzada.** Para cada tiempo se comparan cuatro curvas: (i) teoría exacta, (ii) circuito ideal (sólo error de Trotter), (iii) simulador de IonQ con modelo de ruido `forte-1` y (iv) QPU. La diferencia entre (i) y (ii) es algorítmica, y entre (ii) y (iv) es de hardware.
