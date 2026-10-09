@@ -1,6 +1,6 @@
 // Orquestación de la interfaz: láser → quantum walk 3D, y microcircuito → IonQ.
 import { api } from "./api.js";
-import { WormScene } from "./scene.js";
+import { QUALITY, WormScene } from "./scene.js";
 import { circuitDiagram, groupedBars, SERIES_COLORS, timeSeries } from "./charts.js";
 
 const $ = (id) => document.getElementById(id);
@@ -21,7 +21,8 @@ const state = {
   ionqSeries: null,
 };
 
-const scene = new WormScene($("scene"));
+const savedQuality = (() => { try { return localStorage.getItem("cerebro-calidad") || "auto"; } catch { return "auto"; } })();
+const scene = new WormScene($("scene"), { quality: savedQuality });
 
 // ------------------------------------------------------------------ utilidades
 function toast(msg, isErr = false) {
@@ -76,15 +77,18 @@ async function fire(name = $("neuron-input").value.trim().toUpperCase()) {
 
 function setPlaying(v) {
   state.playing = v;
+  scene.setContinuous(v);
   $("play-icon").innerHTML = v ? '<path d="M7 5h4v14H7zM13 5h4v14h-4z"/>' : '<path d="M7 5l12 7-12 7z"/>';
 }
 
+let _P = null;
 function frameValues(f) {
   const W = state.walk;
   const n = W.prob.length;
   const i0 = Math.min(n - 1, Math.floor(f)), i1 = Math.min(n - 1, i0 + 1), a = f - i0;
   const r0 = W.prob[i0], r1 = W.prob[i1];
-  const P = new Float32Array(r0.length);
+  if (!_P || _P.length !== r0.length) _P = new Float32Array(r0.length);
+  const P = _P;
   for (let k = 0; k < P.length; k++) P[k] = r0[k] * (1 - a) + r1[k] * a;
   return { P, t: W.times[i0] * (1 - a) + W.times[i1] * a, part: W.participation[i0] };
 }
@@ -99,13 +103,17 @@ function renderFrame() {
     if (P[k] / pfire > 0.005) active++;
   }
   const rel = $("relative").checked;
-  const vals = new Float32Array(P.length);
+  const vals = (renderFrame._vals ??= new Float32Array(P.length));
   for (let k = 0; k < P.length; k++) {
     const v = rel ? P[k] / Math.max(max, 1e-12) : Math.sqrt(P[k] / pfire);
     vals[k] = Math.min(1, v);
   }
   scene.setActivity(vals);
   $("time-label").textContent = `t = ${t.toFixed(1)}`;
+  // El panel de texto se actualiza ~8 veces por segundo (el DOM es caro; la escena va a 60 fps)
+  const now = performance.now();
+  if (state.playing && now - (renderFrame._lastUI ?? 0) < 120) return;
+  renderFrame._lastUI = now;
   $("timeline").value = Math.round((1000 * state.frame) / (state.walk.prob.length - 1));
   $("m-active").textContent = active;
   $("m-part").textContent = part.toFixed(1);
@@ -308,6 +316,18 @@ function bindUI() {
   });
   $("relative").addEventListener("change", renderFrame);
   $("show-edges").addEventListener("change", () => scene.setEdgesVisible($("show-edges").checked));
+  $("quality").value = savedQuality;
+  $("quality").addEventListener("change", () => {
+    const q = $("quality").value;
+    try { localStorage.setItem("cerebro-calidad", q); } catch { /* sin almacenamiento */ }
+    scene.setQuality(q);
+  });
+  scene.on("quality", (q, auto) => {
+    const opt = $("quality").querySelector('option[value="auto"]');
+    opt.textContent = `Auto (${QUALITY[q].label.toLowerCase()})`;
+    if (auto) toast(`Calidad gráfica ajustada a "${QUALITY[q].label}" para mantener la fluidez`);
+  });
+  $("autorotate").addEventListener("change", () => scene.setAutoRotate($("autorotate").checked));
   $("toplist").addEventListener("click", (e) => {
     const li = e.target.closest("li");
     if (li) scene.focus(state.index.get(li.dataset.n));

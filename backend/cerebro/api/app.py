@@ -14,7 +14,11 @@ Rutas
 
 from __future__ import annotations
 
+import json
+import threading
 import traceback
+from collections import OrderedDict
+from contextlib import asynccontextmanager
 
 import numpy as np
 from pydantic import ValidationError
@@ -22,8 +26,9 @@ from starlette.applications import Starlette
 from starlette.concurrency import run_in_threadpool
 from starlette.middleware import Middleware
 from starlette.middleware.cors import CORSMiddleware
+from starlette.middleware.gzip import GZipMiddleware
 from starlette.requests import Request
-from starlette.responses import JSONResponse
+from starlette.responses import JSONResponse, Response
 from starlette.routing import Mount, Route
 from starlette.staticfiles import StaticFiles
 
@@ -34,6 +39,39 @@ from ..ionq import experiment
 from ..microcircuits import MICROCIRCUITS
 from ..pipeline import full_network_walk, simulate_microcircuit
 from .schemas import IonQSubmitRequest, MicrocircuitRequest, WalkRequest
+
+
+class _LRU:
+    """Caché LRU de respuestas ya serializadas (mismo pedido → misma respuesta, sin recalcular)."""
+
+    def __init__(self, size: int = 64):
+        self.size, self.data, self.lock = size, OrderedDict(), threading.Lock()
+
+    def get(self, key):
+        with self.lock:
+            if key in self.data:
+                self.data.move_to_end(key)
+                return self.data[key]
+        return None
+
+    def put(self, key, value):
+        with self.lock:
+            self.data[key] = value
+            self.data.move_to_end(key)
+            while len(self.data) > self.size:
+                self.data.popitem(last=False)
+
+
+_CACHE = _LRU(96)
+
+
+async def _cached(kind: str, req, compute) -> Response:
+    key = kind + json.dumps(req.model_dump(), sort_keys=True)
+    body = _CACHE.get(key)
+    if body is None:
+        body = _json(await run_in_threadpool(compute)).body
+        _CACHE.put(key, body)
+    return Response(body, media_type="application/json")
 
 
 def _json(data, status: int = 200) -> JSONResponse:
@@ -118,8 +156,8 @@ async def connectome(request: Request):
 @handle_errors
 async def walk(request: Request):
     req = await _body(request, WalkRequest)
-    return _json(await run_in_threadpool(full_network_walk, req.source, req.theta, req.gamma, req.t_max,
-                                         req.frames, req.weighting))
+    return await _cached("walk", req, lambda: full_network_walk(
+        req.source, req.theta, req.gamma, req.t_max, req.frames, req.weighting))
 
 
 @handle_errors
@@ -135,7 +173,7 @@ async def microcircuits(request: Request):
 @handle_errors
 async def micro_simulate(request: Request):
     req = await _body(request, MicrocircuitRequest)
-    return _json(await run_in_threadpool(lambda: simulate_microcircuit(**req.model_dump())))
+    return await _cached("micro", req, lambda: simulate_microcircuit(**req.model_dump()))
 
 
 @handle_errors
@@ -181,8 +219,28 @@ def create_app() -> Starlette:
     ]
     if config.FRONTEND_DIR.exists():
         routes.append(Mount("/", StaticFiles(directory=str(config.FRONTEND_DIR), html=True), name="frontend"))
-    middleware = [Middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])]
-    return Starlette(routes=routes, middleware=middleware)
+    middleware = [
+        Middleware(GZipMiddleware, minimum_size=1000),
+        Middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"]),
+    ]
+    return Starlette(routes=routes, middleware=middleware, lifespan=_lifespan)
+
+
+@asynccontextmanager
+async def _lifespan(app):
+    _warm_up()
+    yield
+
+
+def _warm_up() -> None:
+    """Precalcula en segundo plano lo que la interfaz pide al abrirse (primer uso más rápido)."""
+    def work():
+        try:
+            get_connectome().eigh()
+            full_network_walk("AVM")
+        except Exception:  # pragma: no cover
+            traceback.print_exc()
+    threading.Thread(target=work, daemon=True).start()
 
 
 app = create_app()

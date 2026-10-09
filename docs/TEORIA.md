@@ -286,6 +286,8 @@ El backend elige $r^* = \arg\min_r\big[\mathrm{TVD}_{\text{Trotter}}(r) + (1 - F
 
 El simulador local (`circuits/simulator.noisy_probabilities`) usa este mismo modelo: un canal despolarizante tras cada compuerta física (Pauli aleatorio por trayectoria de Monte Carlo) y error de lectura simétrico de 0,5 %. Sirve para ensayar la demo sin conexión.
 
+El estimador es estratificado. El término sin errores, de peso $P_0=\prod_i(1-p_i)$, se suma de forma exacta como la distribución ideal. Las trayectorias se condicionan a tener al menos un error: el primero se muestrea de $q_i = p_i\prod_{j<i}(1-p_j)/(1-P_0)$ y la simulación arranca desde el estado ideal ya calculado tras la compuerta $i$. La esperanza es idéntica a la de Monte Carlo simple, con menor varianza y unas 7 veces menos cómputo. `test_matches_density_matrix` lo compara contra la evolución exacta de la matriz densidad.
+
 ---
 
 ## 8. Mitigación de errores y protocolo experimental
@@ -307,7 +309,7 @@ python scripts/run_ionq_experiment.py --backend qpu.forte-1 --times 10 20 30 40 
 
 ## 9. Verificación numérica implementada
 
-`python -m unittest discover -s tests` (o `pytest`) corre 25 pruebas:
+`python -m unittest discover -s tests` (o `pytest`) corre 28 pruebas:
 
 | Afirmación de la teoría | Test |
 |---|---|
@@ -321,6 +323,7 @@ python scripts/run_ionq_experiment.py --backend qpu.forte-1 --times 10 20 30 40 
 | Re-síntesis con ≤ 2 GPi2 | `test_single_qubit_synthesis` |
 | Error de Trotter $\propto 1/r$ y $1/r^2$ | `test_first_order_scaling`, `test_second_order_scaling` |
 | Givens reproduce la distribución exacta con ≤ n−1 saltos | `test_givens_reproduces_distribution` |
+| El simulador con ruido reproduce el canal despolarizante exacto (matriz densidad) | `test_matches_density_matrix` |
 | Flujo completo API ↔ IonQ (servidor simulado) | `test_ionq_flow` |
 
 ---

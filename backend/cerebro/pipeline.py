@@ -55,7 +55,7 @@ def full_network_walk(
         "gamma": gamma,
         "fire_probability": float(np.sin(theta / 2) ** 2),
         "times": times.round(5).tolist(),
-        "prob": np.round(P, 6).tolist(),
+        "prob": np.round(P, 5).tolist(),
         "arrival_time": [None if np.isnan(a) else round(float(a), 4) for a in arr],
         "participation": participation.round(3).tolist(),
         "neurons": C.names,

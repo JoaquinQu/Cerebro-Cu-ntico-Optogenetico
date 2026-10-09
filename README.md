@@ -6,6 +6,8 @@ Visualización 3D del conectoma real de *C. elegans* (302 neuronas). Un "láser 
 
 *Vista previa ilustrativa con una red sintética de 302 neuronas. El prototipo ya usa el conectoma real.*
 
+> This effort is supported by Qollab & IonQ.
+
 | Documento | Contenido |
 | --- | --- |
 | [`docs/TEORIA.md`](docs/TEORIA.md) | Física y fundamento de cada decisión del backend (modelo XY, láser como rotación de Rabi, Trotter, compilación a IonQ, errores, referencias) |
@@ -55,7 +57,7 @@ Los resultados quedan en `backend/data/results/jobs/` y la interfaz los muestra 
 
 ```bash
 cd backend
-python -m unittest discover -s tests      # 25 pruebas: física, compilación, Trotter, flujo IonQ
+python -m unittest discover -s tests      # 28 pruebas: física, compilación, Trotter, ruido, flujo IonQ, modelo 3D
 python scripts/resource_report.py         # presupuesto de compuertas para IonQ Forte
 ```
 
@@ -70,6 +72,25 @@ python scripts/resource_report.py         # presupuesto de compuertas para IonQ 
   - Envío a IonQ desde la interfaz o por script.
 - **Exportación:** JSON listo para la API de IonQ y OpenQASM 2.0 (para Qiskit o Braket).
 
+### Si la app se ve lenta
+
+En el panel izquierdo hay un selector de **calidad**:
+
+- **Auto** (por defecto) baja la calidad sola si la animación cae bajo 28 cuadros por segundo.
+- **Alta** usa resplandor a resolución completa.
+- **Media** usa resplandor a media resolución.
+- **Baja** quita el resplandor y reduce la resolución; está pensada para notebooks con gráficos integrados.
+
+La escena sólo se dibuja cuando algo cambia, así que en reposo casi no usa la tarjeta gráfica. La casilla **rotar** activa el giro automático, que viene apagado para ahorrar recursos.
+
+### Video cinematográfico en Blender
+
+```
+blender\renderizar.bat eevee media AVM
+```
+
+Genera `blender/render/cerebro_cuantico.mp4` con los mismos datos y la misma física que la app. Requiere Blender 4.2 o superior; los detalles están en [`blender/README.md`](blender/README.md). El cuerpo 3D de la app (`frontend/assets/gusano.glb`) se puede editar en Blender y volver a exportar ([`docs/MODELO_3D.md`](docs/MODELO_3D.md)).
+
 ### Estructura del repositorio
 
 ```
@@ -80,15 +101,18 @@ python scripts/resource_report.py         # presupuesto de compuertas para IonQ 
 │   │   ├── circuits/         # IR, simulador, Trotter/Givens, compilación a IonQ
 │   │   ├── ionq/             # cliente REST v0.4 + registro de experimentos
 │   │   ├── analysis.py       # post-selección y métricas
+│   │   ├── anatomy.py        # malla anatómica del gusano (cuerpo + faringe)
+│   │   ├── gltf.py           # escritor .glb sin dependencias
 │   │   ├── microcircuits.py  # circuitos de toque predefinidos
 │   │   ├── pipeline.py       # servicios que usa la API
 │   │   └── api/              # servidor HTTP (Starlette)
 │   ├── data/                 # conectoma (Cook 2019) y posiciones (OpenWorm)
-│   ├── scripts/              # experimento IonQ y reporte de recursos
+│   ├── scripts/              # experimento IonQ, recursos, modelo 3D, exportar a Blender
 │   ├── tests/                # pruebas + IonQ simulado
 │   └── run.py
-├── frontend/                 # interfaz three.js (sin build)
-└── docs/                     # TEORIA.md, ARQUITECTURA.md
+├── frontend/                 # interfaz three.js (sin build) + assets/gusano.glb
+├── blender/                  # escena cinematográfica (script bpy) y render del video
+└── docs/                     # TEORIA.md, ARQUITECTURA.md, MODELO_3D.md
 ```
 
 ---
@@ -188,3 +212,24 @@ Una tarea está lista cuando:
 - [ ] Sonido para cada spike
 - [ ] Mostrar la ecuación en pantalla mientras se anima
 - [ ] Segundo organismo (larva de *Drosophila*)
+
+---
+
+## Trabajo previo y créditos (divulgación para la hackathon)
+
+Las bases de la Qollab × IonQ Quantum Hackathon permiten partir de código existente si se declara, y el jurado evalúa lo que se agrega durante la ventana de construcción (9 oct. 19:00 ET – 11 oct. 19:00 ET).
+
+**Construido antes de la ventana** (7–9 oct. 2026, con asistencia de IA, Claude de Anthropic). El último commit previo queda marcado con la etiqueta `pre-hackathon`:
+
+- Backend en Python: conectoma → hamiltoniano XY, quantum walk exacto, circuitos Trotter/Givens, compilación a nativas de IonQ, simulador con ruido, cliente REST de IonQ y API.
+- Frontend 3D en three.js, modelo anatómico `.glb`, escena de Blender y documentación (`docs/`).
+
+**Agregado durante la ventana:** se completará al cierre (ver historial de commits posteriores a `pre-hackathon`).
+
+**Bibliotecas y datos de terceros:**
+
+- [three.js](https://github.com/mrdoob/three.js) r170 (MIT), incluido en `frontend/vendor/three/`.
+- Conectoma de Cook et al., *Nature* 2019, y posiciones de [OpenWorm](https://github.com/openworm) (MIT).
+- numpy, scipy, starlette, uvicorn, pydantic y requests.
+
+**Licencia:** MIT (ver `LICENSE`).

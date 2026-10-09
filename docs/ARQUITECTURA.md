@@ -50,6 +50,19 @@ flowchart LR
 | Cadenas de bits en `counts` del simulador local | carácter i = neurona i (legible de izquierda a derecha) |
 | Seguridad | `IONQ_API_KEY` sólo en `backend/.env` (ignorado por git); la QPU queda bloqueada salvo `ALLOW_QPU=true` |
 
+## Rendimiento
+
+| Capa | Técnica |
+| --- | --- |
+| API | Caché LRU de respuestas (mismo pedido → respuesta instantánea), compresión gzip y precálculo al arrancar |
+| Simulación | Kernels `einsum` sin copias, matrices de compuertas cacheadas, estimador de ruido estratificado (unas 7 veces más rápido) |
+| 3D | Render bajo demanda, calidad auto/alta/media/baja, bloom a media resolución, selección en espacio de pantalla, tablas de color precalculadas |
+| Interfaz | Paneles de texto actualizados unas 8 veces por segundo (la escena va a la tasa de refresco) |
+
+## Modelo 3D y Blender
+
+`frontend/assets/gusano.glb` lo genera `scripts/generar_modelo_3d.py` a partir de `anatomy.py`. Si falta, la app usa un cuerpo aproximado. `blender/animar_gusano.py` construye la misma escena para renderizar video. Las convenciones de coordenadas están en `docs/MODELO_3D.md`.
+
 ## Dependencias
 
 - **Backend:** numpy, scipy, starlette, uvicorn, pydantic y requests. Se eligió Starlette en vez de FastAPI para tener menos dependencias; los handlers están en `api/app.py` y la validación en `api/schemas.py`.

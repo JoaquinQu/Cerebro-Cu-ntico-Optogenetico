@@ -18,6 +18,7 @@ Convenciones (verificadas en tests/test_compilation.py):
 from __future__ import annotations
 
 from dataclasses import dataclass, field
+from functools import lru_cache
 from typing import Iterable
 
 import numpy as np
@@ -46,7 +47,9 @@ NATIVE_ARIA = {"gpi", "gpi2", "ms", "rz"}
 QIS = {"h", "x", "rx", "ry", "rz", "cnot"}
 
 
+@lru_cache(maxsize=8192)
 def gate_matrix(name: str, params: tuple[float, ...]) -> np.ndarray:
+    """Matriz de la compuerta (cacheada: no modificar el arreglo devuelto)."""
     if name == "gpi":
         return _sigma(params[0])
     if name == "gpi2":

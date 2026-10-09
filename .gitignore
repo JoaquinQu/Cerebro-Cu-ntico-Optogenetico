@@ -12,3 +12,8 @@ backend/data/results/jobs/*.json
 .DS_Store
 Thumbs.db
 desktop.ini
+
+# Blender (se regeneran)
+blender/render/
+blender/*.blend
+blender/*.blend1
