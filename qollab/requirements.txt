@@ -1,0 +1,4 @@
+# Qollab instala Qiskit siempre (qiskit>=2.5.2,<3.0.0). NumPy y SciPy vienen con Pyodide;
+# se listan porque los módulos Python se importan desde main.js.
+numpy>=1.24
+scipy>=1.10

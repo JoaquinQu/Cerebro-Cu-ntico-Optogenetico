@@ -16,6 +16,22 @@ Visualización 3D del conectoma real de *C. elegans* (302 neuronas). Un "láser 
 
 ---
 
+## Versión para Qollab (la que se entrega)
+
+La carpeta [`qollab/`](qollab/README.md) contiene el proyecto **JS / Qiskit** que corre en Qollab.xyz. En ella:
+
+- Python (Pyodide) arma los circuitos con `qiskit.QuantumCircuit`;
+- los circuitos se ejecutan con el `backend` que elige quien presiona *Run*: simulador del navegador, simuladores de IonQ o hardware Forte.
+
+Los pasos para subirla y el texto de la página del proyecto están en [`qollab/README.md`](qollab/README.md). Para probarla en local:
+
+```bash
+cd qollab
+python dev/servidor.py      # http://127.0.0.1:8765
+```
+
+---
+
 ## Prototipo: cómo correrlo
 
 Requisitos: Python 3.10 o superior. El frontend no necesita instalación porque three.js ya viene incluido en `frontend/vendor/`, así que funciona sin internet.
@@ -112,6 +128,7 @@ Genera `blender/render/cerebro_cuantico.mp4` con los mismos datos y la misma fí
 │   └── run.py
 ├── frontend/                 # interfaz three.js (sin build) + assets/gusano.glb
 ├── blender/                  # escena cinematográfica (script bpy) y render del video
+├── qollab/                   # proyecto JS / Qiskit para Qollab.xyz (lo que se entrega)
 └── docs/                     # TEORIA.md, ARQUITECTURA.md, MODELO_3D.md
 ```
 
