@@ -97,7 +97,9 @@ def circuito_paso(Js: np.ndarray, theta: float, tau: float, gamma: float, pasos:
         qc.rx(theta, 0)
     if terminos and tau > 0:
         H = SparsePauliOp.from_sparse_list(terminos, num_qubits=n)
-        qc.append(PauliEvolutionGate(H, time=tau, synthesis=SuzukiTrotter(order=2, reps=pasos)), range(n))
+        evol = PauliEvolutionGate(H, time=tau, synthesis=SuzukiTrotter(order=2, reps=pasos),
+                                  label=rf"$e^{{-i\tau H_{{XY}}}}$  τ={tau:g}")
+        qc.append(evol, range(n))
     qc.measure(range(n), range(n))
     return qc, "pauli_evolution"
 
@@ -182,6 +184,7 @@ def ejecutar_paso(backend, centro: int, theta: float, tau: float, gamma: float, 
         "metodo": metodo,
         "ops_escritas": _ops(qc),
         "ops_transpilado": _ops(enviar),
+        "conteos": {str(k): int(v) for k, v in conteos.items()},
     }
 
 

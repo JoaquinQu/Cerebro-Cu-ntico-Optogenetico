@@ -30,6 +30,8 @@ export const py = {
   /** Un paso de la cascada: un circuito de 10 qubits en UN job del backend. */
   paso: (backend, params) => llamar("paso_json", backend, JSON.stringify(params)),
   comparacion: (params) => llamar("comparacion_json", JSON.stringify(params)),
+  /** Circuito con draw("mpl") e histograma de Qiskit, como data URI SVG. */
+  figuras: (params) => llamar("figuras_json", JSON.stringify(params)),
   /** Bytes del cuerpo 3D (data/gusano.glb): Python lo lee y lo entrega en base64. */
   async cuerpo() {
     const b64 = texto(await api.cuerpo_glb.callPromising());

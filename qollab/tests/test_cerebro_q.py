@@ -87,6 +87,15 @@ class TestApiQollab(unittest.TestCase):
         self.assertLess(s["tvd_circuito"], 0.15)
         self.assertIn("ruido", s)
 
+    def test_theta_escala_y_eje_fijo(self):
+        """Con un láser θ sólo escala P_k por sin²(θ/2): el eje fijo (escala de θ = π) debe mostrarlo."""
+        lleno = json.loads(api.simular_json(json.dumps({"preset": "toque-6", "t": 30, "theta": math.pi})))
+        medio = json.loads(api.simular_json(json.dumps({"preset": "toque-6", "t": 30, "theta": math.pi / 2})))
+        self.assertAlmostEqual(lleno["escala_y"], medio["escala_y"], places=5)
+        self.assertEqual(lleno["pasos"], medio["pasos"])  # el autoajuste de Trotter no depende de θ
+        for serie in ("exacta", "ideal"):
+            np.testing.assert_allclose(np.array(medio[serie]), 0.5 * np.array(lleno[serie]), atol=1e-5)
+
     def test_ejecutar_un_solo_job_varios_tiempos(self):
         r = json.loads(api.ejecutar_json(backend_de_prueba(), json.dumps(
             {"preset": "toque-6", "modo": "givens", "tiempos": [10, 20, 30], "shots": 4000})))
@@ -163,6 +172,33 @@ class TestCascada(unittest.TestCase):
             self.assertAlmostEqual(cur[k]["origen"][0], 1.0, places=6)
         # Efecto Zeno: medido cada τ = 2 se queda más en el origen que el walk coherente
         self.assertGreater(cur["medido"]["origen"][5], cur["coherente"]["origen"][5])
+
+
+@unittest.skipUnless(REAL, "las figuras usan Qiskit real (draw('mpl'), plot_histogram)")
+class TestFiguras(unittest.TestCase):
+    SVG = "data:image/svg+xml;base64,"
+
+    def test_microcircuito(self):
+        f = json.loads(api.figuras_json(json.dumps({"tipo": "micro", "preset": "toque-6", "t": 30, "pasos": 2})))
+        self.assertTrue(f["circuito_svg"].startswith(self.SVG))
+        self.assertTrue(f["histograma_svg"].startswith(self.SVG))
+        self.assertEqual(f["histograma_tipo"], "ideal")
+        self.assertEqual(f["ops"]["rx"], 1)
+
+    def test_paso_con_conteos(self):
+        p = {"centro": "AVM", "tau": 5, "shots": 100, "pasos_trotter": 1, "semilla": 2}
+        r = json.loads(api.paso_json(backend_de_prueba(), json.dumps(p)))
+        self.assertEqual(sum(r["conteos"].values()), 100)
+        for vista, nombre in (("compacta", "PauliEvolution"), ("expandida", "rxx")):
+            f = json.loads(api.figuras_json(json.dumps({"tipo": "paso", **p, "vista": vista, "conteos": r["conteos"]})))
+            self.assertIn(nombre, f["ops"])
+            self.assertEqual(f["histograma_tipo"], "medido")
+            self.assertEqual(f["neuronas"], r["ventana"])
+
+    def test_etiquetas_de_estado(self):
+        from cerebro_q import visual
+        self.assertEqual(visual.etiqueta_estado("000", ["A", "B", "C"]), "∅ (nadie)")
+        self.assertEqual(visual.etiqueta_estado("101", ["A", "B", "C"]), "A+C")  # qubit 0 = derecha
 
 
 class TestReglasQollab(unittest.TestCase):

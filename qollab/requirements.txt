@@ -2,3 +2,7 @@
 # se listan porque los módulos Python se importan desde main.js.
 numpy>=1.24
 scipy>=1.10
+# Figuras de Qiskit: QuantumCircuit.draw("mpl"), plot_histogram y plot_distribution.
+# matplotlib viene con Pyodide; pylatexenc (wheel pura de Python) lo exige el dibujo "mpl".
+matplotlib>=3.5
+pylatexenc>=2.10
