@@ -440,6 +440,130 @@ export class WormScene {
     return true;
   }
 
+  // ---------------------------------------------------------- medición (colapso)
+  /**
+   * Animación de la medida de un paso de la cascada.
+   *  fase 1 (superposición): las neuronas de la ventana laten juntas, con halos ∝ √p;
+   *  fase 2 (colapso): partículas viajan desde cada neurona hasta la que salió en 1, los demás
+   *  halos se apagan y la elegida destella. Si no hubo spike (vacío), todo se desvanece.
+   * Devuelve una promesa que se resuelve al terminar (inmediata con prefers-reduced-motion).
+   */
+  collapse(windowIdx, probs, spikeIdx, { superposition = 0.9, collapse = 0.75 } = {}) {
+    this._endCollapse();
+    if (this.reducedMotion || !this.positions || !windowIdx?.length) return Promise.resolve();
+    const tot = probs.reduce((a, b) => a + Math.max(0, b), 0) || 1;
+    const p = probs.map((v) => Math.max(0, v) / tot);
+    const pmax = Math.max(...p, 1e-9);
+    const group = new THREE.Group();
+    const add = (c, o) => new THREE.MeshBasicMaterial({ color: c, transparent: true, opacity: o,
+      blending: THREE.AdditiveBlending, depthWrite: false, toneMapped: false });
+    const haloGeo = new THREE.SphereGeometry(0.22, 18, 12);
+    const halos = windowIdx.map((g, i) => {
+      const m = new THREE.Mesh(haloGeo, add(new THREE.Color("#38e1ff").multiplyScalar(1.3), 0));
+      m.position.copy(this.positions[g]);
+      m.userData = { r: 0.35 + 1.25 * Math.sqrt(p[i] / pmax), ph: i * 0.7 };
+      group.add(m);
+      return m;
+    });
+    // partículas: más cuanto más probable era cada neurona
+    const starts = [];
+    windowIdx.forEach((g, i) => {
+      const n = 3 + Math.round(14 * p[i] / pmax);
+      for (let k = 0; k < n; k++) {
+        const j = new THREE.Vector3((Math.random() - 0.5) * 0.3, (Math.random() - 0.5) * 0.3, (Math.random() - 0.5) * 0.3);
+        starts.push({ from: this.positions[g].clone().add(j), delay: Math.random() * 0.25 });
+      }
+    });
+    const pp = new Float32Array(starts.length * 3);
+    const pg = new THREE.BufferGeometry();
+    pg.setAttribute("position", new THREE.BufferAttribute(pp, 3));
+    const pts = new THREE.Points(pg, new THREE.PointsMaterial({ color: new THREE.Color("#ffd28a").multiplyScalar(1.6), size: 0.11,
+      transparent: true, opacity: 0, blending: THREE.AdditiveBlending, depthWrite: false, toneMapped: false }));
+    group.add(pts);
+    // destello final sobre la neurona medida
+    const target = spikeIdx != null ? this.positions[spikeIdx] : null;
+    const flash = new THREE.Mesh(new THREE.SphereGeometry(0.3, 18, 12), add(new THREE.Color("#ffb347").multiplyScalar(2.6), 0));
+    const ring = new THREE.Mesh(new THREE.RingGeometry(0.24, 0.29, 48), add(new THREE.Color("#ffb347").multiplyScalar(2.2), 0));
+    ring.material.side = THREE.DoubleSide;
+    if (target) { flash.position.copy(target); ring.position.copy(target); group.add(flash, ring); }
+    this.scene.add(group);
+
+    const N = this.neurons.length;
+    const vals = new Float32Array(N);
+    const base = this.activity ? Float32Array.from(this.activity) : new Float32Array(N);
+    return new Promise((resolve) => {
+      this._collapse = {
+        t: 0, group, resolve,
+        update: (dt) => {
+          const C = this._collapse;
+          C.t += dt;
+          const t = C.t, T1 = superposition, T2 = superposition + collapse, TAIL = 0.45;
+          if (t >= T2) {
+            // cola: la actividad ya la decide main.js; sólo se apaga el destello
+            if (!C.done) { C.done = true; pts.visible = false; halos.forEach((h) => { h.visible = false; }); resolve(); }
+            const v = Math.min(1, (t - T2) / TAIL);
+            flash.material.opacity = 0.9 * (1 - v);
+            ring.material.opacity = 0.9 * (1 - v);
+            ring.scale.setScalar(3.5 + 2 * v);
+            ring.lookAt(this.camera.position);
+            if (v >= 1) { this._endCollapse(); return false; }
+            return true;
+          }
+          vals.set(base);
+          for (let i = 0; i < N; i++) vals[i] *= 0.35;
+          if (t < T1) {
+            // fase 1: superposición (todas a la vez, latiendo)
+            const a = Math.min(1, t / 0.25);
+            windowIdx.forEach((g, i) => {
+              const beat = 0.75 + 0.25 * Math.sin(t * 9 + halos[i].userData.ph);
+              vals[g] = Math.min(1, (0.35 + 0.65 * Math.sqrt(p[i] / pmax)) * beat * a);
+              halos[i].scale.setScalar(halos[i].userData.r * (0.85 + 0.2 * beat));
+              halos[i].material.opacity = 0.45 * a * (0.35 + 0.65 * Math.sqrt(p[i] / pmax));
+            });
+          } else {
+            // fase 2: colapso
+            const u = Math.min(1, (t - T1) / collapse);
+            const fade = 1 - u;
+            windowIdx.forEach((g, i) => {
+              const own = g === spikeIdx;
+              vals[g] = own ? Math.min(1, 0.6 + 0.4 * u) : Math.max(0.04, (0.35 + 0.65 * Math.sqrt(p[i] / pmax)) * fade * fade);
+              halos[i].material.opacity = own ? 0.45 * fade : 0.45 * fade * fade * (0.35 + 0.65 * Math.sqrt(p[i] / pmax));
+            });
+            if (target) {
+              pts.material.opacity = Math.min(1, 3 * u) * (u < 0.85 ? 1 : (1 - u) / 0.15);
+              starts.forEach((s, k) => {
+                const v = Math.max(0, Math.min(1, (u - s.delay) / (1 - s.delay)));
+                const e = v * v * (3 - 2 * v);
+                pp[k * 3] = s.from.x + (target.x - s.from.x) * e;
+                pp[k * 3 + 1] = s.from.y + (target.y - s.from.y) * e + Math.sin(Math.PI * e) * 0.25;
+                pp[k * 3 + 2] = s.from.z + (target.z - s.from.z) * e;
+              });
+              pg.attributes.position.needsUpdate = true;
+              const f = Math.max(0, (u - 0.6) / 0.4);
+              flash.material.opacity = 0.9 * f;
+              flash.scale.setScalar(0.5 + 0.9 * f);
+              ring.material.opacity = 0.9 * f;
+              ring.scale.setScalar(1 + 2.5 * f);
+              ring.lookAt(this.camera.position);
+            }
+          }
+          this.setActivity(vals);
+          return true;
+        },
+      };
+    });
+  }
+
+  _endCollapse() {
+    const C = this._collapse;
+    if (!C) return;
+    this._collapse = null;
+    this.scene.remove(C.group);
+    C.group.traverse((o) => { o.geometry?.dispose(); o.material?.dispose(); });
+    this.requestRender();
+    C.resolve();
+  }
+
   resetView() {
     this.camera.position.set(-1.2, 6.0, 23.5);
     this.controls.target.set(0, 0, 0);
@@ -559,6 +683,7 @@ export class WormScene {
     }
     if (this.controls.update()) active = true; // amortiguación / rotación automática
     if (this._animateLaser(dt)) active = true;
+    if (this._collapse && this._collapse.update(dt)) active = true;
 
     if (this._pointerMoved) {
       this._pointerMoved = false;

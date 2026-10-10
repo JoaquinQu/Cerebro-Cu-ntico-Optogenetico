@@ -20,11 +20,11 @@ In optogenetics, a pulse of light makes a chosen neuron fire, and researchers wa
 | Activity travels along synapses | Quantum walk under the XY Hamiltonian on the real connectome |
 | Calcium imaging | Z-basis measurement: 1 = *spike* |
 
-The page has three parts:
+The page is organised in three chapters, one idea at a time, with a live "What you're seeing" narration over the 3D worm, "?" help next to every technical term, and the advanced settings tucked into a **Lab settings** drawer:
 
-1. **Laser and exact theory.** Pick any of the 302 neurons and the 3D worm shows how the excitation spreads. With a single laser, the 302-qubit XY model reduces *exactly* to a quantum walk with 302 amplitudes, so this part is computed exactly with NumPy and serves as the reference.
-2. **Quantum spike cascade (Qiskit).** Each step is a 10-qubit circuit: the neuron that fired and its 9 neighbours with the most synapses. The XY evolution is built with `PauliEvolutionGate` + `SuzukiTrotter` and runs on the selected backend (**one job per step**). The neuron that comes out as 1 in a random shot triggers the next step; the spike jumps across the worm and leaves a trail.
-3. **Touch-reflex microcircuit (Qiskit).** A 6- to 10-qubit circuit (RX + RXX·RYY, via Trotter or Givens), compared with the exact theory, with an IonQ Forte-like noise model and with what the backend measures, using symmetry post-selection.
+1. **Light (laser and exact theory).** Pick any of the 302 neurons and the 3D worm shows how the excitation spreads. With a single laser, the 302-qubit XY model reduces *exactly* to a quantum walk with 302 amplitudes, so this part is computed exactly with NumPy and serves as the reference.
+2. **Measure (quantum spike cascade with Qiskit).** Each step is a 10-qubit circuit: the neuron that fired and its 9 neighbours with the most synapses. The XY evolution is built with `PauliEvolutionGate` + `SuzukiTrotter` and runs on the selected backend (**one job per step**). The neuron that comes out as 1 in a random shot triggers the next step; the spike jumps across the worm and leaves a trail. Each measurement is animated in 3D: the window neurons pulse together in superposition, then collapse onto the neuron that came out as 1, while a small circuit diagram shows that step's gates and measured bits.
+3. **Inside the circuit (touch-reflex microcircuit with Qiskit).** A 6- to 10-qubit circuit (RX + RXX·RYY, via Trotter or Givens), compared with the exact theory, with an IonQ Forte-like noise model and with what the backend measures, using symmetry post-selection.
 
 Every circuit can be shown drawn with `QuantumCircuit.draw("mpl")`, together with its count histogram.
 
@@ -41,12 +41,12 @@ It also shows the real steps needed to take the physics to hardware: Trotterizat
 ## How to run it
 
 1. Press **Run** and pick a backend. With the **Built-in simulator** everything is immediate and free.
-2. **Panel 1:** pick a neuron (or click one on the worm) and press **Fire laser**. Move θ to see how the light dose scales the response.
-3. **Panel 2:** press **Start cascade**. Try τ = 8 (the excitation moves) and τ = 2 (it barely moves: Zeno effect). Then open **"What changes when you measure?"** and press **Compute comparison**. **Show the cascade circuits** draws each step with Qiskit.
-4. **Panel 3:** pick the microcircuit, the mode and the time t, and press **Run circuit**: one job with 4 times, compared with theory (raw and post-selected TVD).
+2. **Chapter 1 · Light:** pick a neuron (or click one on the worm) and press **Fire laser**. Move θ to see how the light dose scales the response.
+3. **Chapter 2 · Measure:** press **Start cascade** and watch each measurement collapse the wave. Try τ = 8 (the excitation moves) and τ = 2 (it barely moves: Zeno effect; τ is in the chapter, steps and shots in Lab settings). Then open **"What changes when you measure?"** and press **Compute comparison**. **Show the cascade circuits** draws each step with Qiskit.
+4. **Chapter 3 · Inside the circuit:** pick the microcircuit, the mode and the time t, and press **Run circuit**: one job with 4 times, compared with theory (raw and post-selected TVD).
 5. **IonQ:** on *IonQ Forte 1 (Remote simulator)*, which is free, each Run allows one job. The page respects this: the cascade runs one step and then locks the button. For another job, press Stop and Run.
 
-The page is keyboard accessible (with focus on the worm: Space, ←/→, R), announces results to screen readers, has a data table behind every chart, and respects *prefers-reduced-motion*.
+The page is keyboard accessible (chapter tabs with the arrow keys; with focus on the worm: Space, ←/→, R; Esc closes help and settings), announces results to screen readers, has a data table behind every chart, and respects *prefers-reduced-motion*.
 
 ## How it works (theory summary)
 
