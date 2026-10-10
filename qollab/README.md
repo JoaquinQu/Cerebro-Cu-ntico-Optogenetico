@@ -6,17 +6,17 @@ This effort is supported by Qollab & IonQ.
 
 ## Qué se sube a Qollab
 
-Se suben solo estos archivos. Son 20 en total (18 sin README ni LICENSE) y pesan cerca de 1 MB, con lo que se respeta el límite de 100 archivos de 2 MB cada uno.
+Se suben solo estos archivos. Son 21 en total (19 sin README ni LICENSE) y pesan cerca de 1 MB, con lo que se respeta el límite de 100 archivos de 2 MB cada uno.
 
 ```
 index.html              cuerpo de la página (sin <script>, Qollab lo pega en <body>)
 main.js                 orquesta la página e importa cerebro_q.api por su nombre de módulo
 main.css                estilos (el único CSS que carga Qollab)
-requirements.txt        numpy y scipy (Qiskit lo instala Qollab)
+requirements.txt        numpy, scipy, matplotlib y pylatexenc (Qiskit lo instala Qollab)
 js/escena.js            escena 3D (three 0.186, importado por nombre)
 js/graficos.js          gráficos SVG y tablas accesibles
 js/python.js            puente: .callPromising + JSON
-cerebro_q/              núcleo Python: datos, física, circuitos Qiskit, cascada por ventanas, análisis, api
+cerebro_q/              núcleo Python: datos, física, circuitos Qiskit, cascada por ventanas, análisis, figuras mpl, api
 data/neurons.json       posiciones de las 302 neuronas (OpenWorm)
 data/connectome_cook2019.csv   sinapsis (Cook et al. 2019)
 data/gusano.glb         cuerpo 3D (lo lee Python y lo entrega en base64)
@@ -35,7 +35,7 @@ Estas carpetas **no se suben**, porque son solo para desarrollo: `dev/` y `tests
 6. Para el hardware **IonQ Forte 1 (Quantum computer)**, que usa créditos, la página pide confirmar con un segundo clic.
 7. Copia el texto de la sección *Project Card* (abajo) en la página del proyecto y **publica**.
 
-> **Pendiente de verificar en Qollab:** el entorno donde se construyó no tiene Qiskit real. Las pruebas usaron una imitación mínima (`dev/qiskit_simulado`) y la física se comparó con numpy. La primera corrida en Qollab sobre el *Built-in simulator* confirma `transpile`, el dibujo de texto del circuito y `get_counts(i)` con Qiskit 2.x.
+> **Verificado en local con Qiskit 2.5.2 real** (`BasicSimulator`): `PauliEvolutionGate` + `SuzukiTrotter`, `transpile`, `get_counts(i)`, `draw("mpl")`, `plot_histogram` y `plot_distribution`. **Pendiente en Qollab:** confirmar que Pyodide instala `matplotlib` y `pylatexenc` desde `requirements.txt`. Si falla, el resto de la página sigue funcionando; solo el diálogo de figuras muestra el error.
 
 ## Cómo funciona
 
@@ -60,8 +60,9 @@ La teoría completa está en [`../docs/TEORIA.md`](../docs/TEORIA.md).
 ## Desarrollo local (sin Qollab)
 
 ```bash
+pip install "qiskit>=2.5.2,<3" -r qollab/requirements.txt   # en el .venv de la raíz
 cd qollab
-python -m unittest discover -s tests      # 20 pruebas (física, circuitos, cascada, reglas de Qollab)
+python -m unittest discover -s tests      # 24 pruebas (física, circuitos, cascada, figuras, reglas de Qollab)
 python dev/servidor.py                    # http://127.0.0.1:8765  (?backend=ionq | ?backend=qpu)
 python dev/prueba_navegador.py            # prueba de humo con Playwright (servidor encendido)
 ```

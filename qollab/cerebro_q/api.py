@@ -11,7 +11,7 @@ import math
 
 import numpy as np
 
-from . import analisis, cascada, circuitos, datos, fisica
+from . import analisis, cascada, circuitos, datos, fisica, visual
 from .microcircuitos import MICROCIRCUITOS
 
 
@@ -105,12 +105,13 @@ def _saltos(J, fuentes, theta, t, gamma, modo, pasos, orden):
     return circuitos.saltos_trotter(J, t, pasos, gamma, orden)
 
 
-def _autoajuste(J, fuentes, theta, t, gamma, orden, max_pasos):
+def _autoajuste(J, fuentes, t, gamma, orden, max_pasos):
+    # Se evalúa con θ = π: con θ menor la TVD se encoge por sin²(θ/2) y elegiría menos pasos.
     n = len(J)
-    exacta = fisica.distribucion_exacta(J, fuentes, theta, t, gamma)
+    exacta = fisica.distribucion_exacta(J, fuentes, math.pi, t, gamma)
     tabla = []
     for r in range(1, max_pasos + 1):
-        ops = circuitos.operaciones(n, fuentes, theta, circuitos.saltos_trotter(J, t, r, gamma, orden))
+        ops = circuitos.operaciones(n, fuentes, math.pi, circuitos.saltos_trotter(J, t, r, gamma, orden))
         rec = circuitos.recursos(ops)
         e = analisis.tvd(exacta, circuitos.probabilidades_ideales(ops, n))
         tabla.append({"pasos": r, "tvd_trotter": e, "fidelidad": rec["fidelidad_estimada"],
@@ -128,18 +129,21 @@ def simular_json(params_json: str) -> str:
     pasos = int(p.get("pasos") or 0)
     tabla = None
     if modo == "trotter" and pasos <= 0:
-        pasos, tabla = _autoajuste(J, fuentes, theta, t, gamma, orden, 6 if n <= 7 else 3)
+        pasos, tabla = _autoajuste(J, fuentes, t, gamma, orden, 6 if n <= 7 else 3)
     pasos = max(pasos, 1)
     saltos = _saltos(J, fuentes, theta, t, gamma, modo, pasos, orden)
     ops = circuitos.operaciones(n, fuentes, theta, saltos)
     exacta = fisica.distribucion_exacta(J, fuentes, theta, t, gamma)
     ideal = circuitos.probabilidades_ideales(ops, n)
+    # Eje Y fijo a la escala del pulso completo (θ = π): así bajar θ achica las barras de verdad
+    escala_y = max(analisis.marginales(fisica.distribucion_exacta(J, fuentes, math.pi, t, gamma), n))
     out = {
         "neuronas": nombres, "fuente": fuente, "n_qubits": n, "theta": theta, "t": t, "gamma": gamma,
         "modo": modo, "pasos": pasos, "orden": orden,
         "exacta": analisis.marginales(exacta, n),
         "ideal": analisis.marginales(ideal, n),
         "tvd_circuito": analisis.tvd(exacta, ideal),
+        "escala_y": escala_y,
         "recursos": circuitos.recursos(ops),
         "autoajuste": tabla,
         "saltos": [{"a": a, "b": b, "alfa": al, "tag": tag} for a, b, al, tag in saltos],
@@ -249,6 +253,54 @@ def paso_json(backend, params_json: str) -> str:
         semilla=p.get("semilla"),
     )
     out["backend"] = _nombre_backend(backend)
+    return _json(out)
+
+
+# ---------------------------------------------------------------------------
+# Figuras de Qiskit (matplotlib)
+# ---------------------------------------------------------------------------
+def figuras_json(params_json: str) -> str:
+    """Circuito dibujado con draw("mpl") + histograma (conteos medidos o distribución ideal).
+
+    tipo "micro": el microcircuito (mismos parámetros que simular_json, más t).
+    tipo "paso":  un paso de la cascada; vista "compacta" (PauliEvolutionGate como una caja)
+                  o "expandida" (la síntesis de Suzuki-Trotter en RXX/RYY).
+    En ambos, "conteos" (opcional) son los conteos que devolvió el backend.
+    """
+    p = json.loads(params_json or "{}")
+    conteos = p.get("conteos") or None
+    if p.get("tipo") == "paso":
+        centro = fisica.indice(p.get("centro", "AVM"))
+        J, nombres_red, _ = fisica.acoplamientos()
+        w = cascada.ventana(centro)
+        nombres = [nombres_red[i] for i in w]
+        tau = float(p.get("tau", 8.0))
+        qc, _ = cascada.circuito_paso(J[np.ix_(w, w)], float(p.get("theta", math.pi)), tau,
+                                      float(p.get("gamma", 1.0)), int(p.get("pasos_trotter", 1)))
+        expandida = p.get("vista") == "expandida"
+        dibujo = qc.decompose(gates_to_decompose=["PauliEvolution"]) if expandida else qc
+        titulo = f"Paso de la cascada desde {nombres[0]} (τ = {tau:g})"
+    else:
+        nombres, J, fuentes, _ = _preparar(p)
+        theta, t, gamma = float(p.get("theta", math.pi)), float(p.get("t", 30)), float(p.get("gamma", 1))
+        modo, orden = p.get("modo", "trotter"), int(p.get("orden", 2))
+        pasos = max(int(p.get("pasos") or 2), 1)
+        ops = circuitos.operaciones(len(nombres), fuentes, theta, _saltos(J, fuentes, theta, t, gamma, modo, pasos, orden))
+        qc = dibujo = circuitos.a_qiskit(ops, len(nombres), nombre=f"t={t:g}")
+        titulo = f"Microcircuito ({modo}, t = {t:g})"
+    out = {
+        "titulo": titulo,
+        "neuronas": nombres,
+        "ops": visual.resumen_ops(dibujo),
+        "profundidad": int(dibujo.depth()),
+        "circuito_svg": visual.circuito(dibujo, nombres),
+    }
+    if conteos:
+        out["histograma_svg"] = visual.histograma(conteos, nombres, "Conteos medidos en el backend")
+        out["histograma_tipo"] = "medido"
+    else:
+        out["histograma_svg"] = visual.distribucion_ideal(qc, nombres, "Distribución ideal (Statevector)")
+        out["histograma_tipo"] = "ideal"
     return _json(out)
 
 

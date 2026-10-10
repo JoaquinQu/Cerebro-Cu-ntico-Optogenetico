@@ -144,15 +144,16 @@ function frameValues(f) {
 function renderFrame(force = false) {
   if (!state.walk) return;
   const { P, t, part } = frameValues(state.frame);
-  const pfire = Math.max(state.walk.fire_probability, 1e-9);
+  const pfire = state.walk.fire_probability;
   let max = 0, top = 0, active = 0;
   for (let k = 0; k < P.length; k++) {
     if (P[k] > max) { max = P[k]; top = k; }
-    if (P[k] / pfire > 0.005) active++;
+    if (P[k] > 0.005) active++;
   }
+  // No dividir por sin²(θ/2): es el único efecto de θ con un láser y la escena lo borraría.
   const rel = $("relative").checked;
   const vals = (renderFrame._vals ??= new Float32Array(P.length));
-  for (let k = 0; k < P.length; k++) vals[k] = Math.min(1, rel ? P[k] / Math.max(max, 1e-12) : Math.sqrt(P[k] / pfire));
+  for (let k = 0; k < P.length; k++) vals[k] = Math.min(1, rel ? (pfire * P[k]) / Math.max(max, 1e-12) : Math.sqrt(P[k]));
   scene.setActivity(vals);
   $("time-label").textContent = `t = ${t.toFixed(1)}`;
   // El DOM de texto se actualiza ~8 veces por segundo (la escena va a 60 fps)
@@ -240,6 +241,7 @@ async function runCascade() {
   Object.assign(cascade, { running: true, stop: false, centers: [state.source], steps: [] });
   $("casc-btn").disabled = true;
   $("casc-stop").disabled = false;
+  $("casc-fig-btn").disabled = true;
   $("casc-log").innerHTML = "";
   scene.setTrail(null);
   let centro = state.source;
@@ -253,9 +255,9 @@ async function runCascade() {
       if (cascade.stop) { fin = "detenida"; break; }
       $("casc-estado").textContent = `Paso ${k} de ${total}: circuito de 10 qubits en ${state.backend.nombre}…`;
       await respirar();
-      const r = await py.paso(BACKEND, {
-        centro, theta: k === 1 ? theta : Math.PI, tau, gamma, shots, pasos_trotter: trotterReps(tau),
-      });
+      const params = { centro, theta: k === 1 ? theta : Math.PI, tau, gamma, pasos_trotter: trotterReps(tau) };
+      const r = await py.paso(BACKEND, { ...params, shots });
+      r.params = params;
       state.jobsSent++;
       cascade.steps.push(r);
       const salto = r.spike && r.spike !== centro;
@@ -274,6 +276,7 @@ async function runCascade() {
   } finally {
     cascade.running = false;
     $("casc-stop").disabled = true;
+    $("casc-fig-btn").disabled = cascade.steps.length === 0;
     const bloqueado = state.backend.ionq && state.jobsSent >= 1;
     $("casc-btn").disabled = bloqueado;
     cascadeLabel();
@@ -306,6 +309,7 @@ function renderCascadeStep(r, k, total, salto) {
     `<span class="chip">qubits <b>${r.ventana.length}</b></span>`,
     twoq ? `<span class="chip" title="Compuertas de dos qubits tras transpilar para el backend">2q <b>${twoq}</b></span>` : "",
     `<span class="chip" title="Shots con como mucho una excitación (post-selección)">válidos <b>${pct(r.fraccion_valida)}</b></span>`,
+    r.fraccion_vacio > 0 ? `<span class="chip warn" title="Shots sin excitación: la neurona no disparó (cos²(θ/2) en el primer paso)">vacío <b>${pct(r.fraccion_vacio)}</b></span>` : "",
     `<span class="chip warn" title="Cuánto se escaparía de la ventana en la red completa en este τ">fuga <b>${pct(r.fuga_red)}</b></span>`,
     `<span class="chip ${salto ? "good" : ""}">spike <b>${esc(r.spike ?? "—")}</b></span>`,
   ].join("");
@@ -423,7 +427,8 @@ function renderMicro() {
   ];
   if (r.ruido) series.push({ key: "noisy", name: "Ruido tipo Forte (post-sel.)", values: r.ruido.marginales_postseleccion });
   if (fila) series.push({ key: "backend", name: `${m.backend} (post-sel.)`, values: fila.marginales_postseleccion });
-  groupedBars($("bars"), labels, series, { highlight: [labels.indexOf(r.fuente)] });
+  const ymax = 1.1 * Math.max(r.escala_y ?? 0, 0.05, ...series.flatMap((s) => s.values));
+  groupedBars($("bars"), labels, series, { highlight: [labels.indexOf(r.fuente)], max: ymax });
   $("bars-legend").innerHTML = series.map((s) => `<span><i style="background:${SERIES_COLORS[s.key]}"></i>${esc(s.name)}</span>`).join("");
   dataTable($("bars-table"), labels, series, `Probabilidad de disparo por neurona en t = ${r.t}`);
   const puntos = m ? m.resultados.map((f) => ({ t: f.t, values: f.marginales_postseleccion })) : null;
@@ -523,7 +528,73 @@ function renderRunResult(m) {
     `Tras transpilar para el backend: <code>${esc(ops(m.ops_transpilado))}</code></p></div>`;
 }
 
+// ------------------------------------------------------------------ figuras de Qiskit (mpl)
+const fig = { tipo: null, cache: new Map(), turno: 0 };
+
+function abrirFiguras(tipo) {
+  fig.tipo = tipo;
+  const esPaso = tipo === "paso";
+  $("fig-controls").hidden = !esPaso;
+  if (esPaso) {
+    $("fig-step").innerHTML = cascade.steps.map((r, i) =>
+      `<option value="${i}">${i + 1} · ${esc(r.centro)}${r.spike && r.spike !== r.centro ? ` → ${esc(r.spike)}` : ""}</option>`).join("");
+    $("fig-step").value = String(cascade.steps.length - 1);
+  }
+  $("fig-dialog").showModal();
+  dibujarFiguras();
+}
+
+function paramsFiguras() {
+  if (fig.tipo === "paso") {
+    const r = cascade.steps[parseInt($("fig-step").value, 10)];
+    const vista = document.querySelector('input[name="fig-vista"]:checked').value;
+    return { tipo: "paso", ...r.params, vista, conteos: r.conteos };
+  }
+  const r = state.micro;
+  const fila = state.medido ? state.medido.resultados[state.medido.resultados.length - 1] : null;
+  return { tipo: "micro", preset: state.preset, fuente: r.fuente, theta: r.theta, gamma: r.gamma, t: r.t,
+    modo: r.modo, pasos: r.pasos, orden: r.orden, conteos: fila?.conteos ?? null };
+}
+
+async function dibujarFiguras() {
+  const p = paramsFiguras();
+  const clave = JSON.stringify(p);
+  const turno = ++fig.turno;
+  $("fig-estado").textContent = p.vista === "expandida"
+    ? "Dibujando con Qiskit… la vista expandida tiene cientos de compuertas y tarda unos segundos."
+    : "Dibujando con Qiskit…";
+  await respirar();
+  try {
+    let f = fig.cache.get(clave);
+    if (!f) { f = await py.figuras(p); fig.cache.set(clave, f); }
+    if (turno !== fig.turno) return;
+    const ops = Object.entries(f.ops).map(([k, v]) => `${k}: ${v}`).join(", ");
+    const medido = f.histograma_tipo === "medido";
+    $("fig-title").textContent = f.titulo;
+    $("fig-circ").src = f.circuito_svg;
+    $("fig-circ").alt = `Circuito de Qiskit de ${f.neuronas.length} qubits (${f.neuronas.join(", ")}). ` +
+      `Compuertas: ${ops}. Profundidad ${f.profundidad}.`;
+    $("fig-circ-cap").textContent = `QuantumCircuit.draw("mpl") · ${ops} · profundidad ${f.profundidad}`;
+    $("fig-hist").src = f.histograma_svg;
+    $("fig-hist").alt = medido
+      ? "Histograma de los conteos medidos en el backend, agrupados por la neurona que disparó."
+      : "Distribución ideal del circuito según el Statevector de Qiskit, agrupada por neurona excitada.";
+    $("fig-hist-cap").textContent = medido
+      ? "plot_histogram con los conteos que devolvió el backend · ∅ = ninguna neurona disparó."
+      : "plot_distribution del Statevector ideal · todavía no se ejecuta en un backend.";
+    $("fig-estado").textContent = "";
+  } catch (e) {
+    if (turno === fig.turno) $("fig-estado").textContent = `No se pudo dibujar: ${e.message}`;
+  }
+}
+
 // ------------------------------------------------------------------ eventos
+async function recalcular(conMicro) {
+  if (!state.walk || cascade.running) return;
+  await fire(state.source);
+  if (conMicro) compile();
+}
+
 function bindUI() {
   $("fire-btn").addEventListener("click", () => fire());
   $("neuron-input").addEventListener("change", () => neuronCard($("neuron-input").value.trim().toUpperCase()));
@@ -536,6 +607,9 @@ function bindUI() {
   });
   $("gamma").addEventListener("input", () => { $("gamma-val").textContent = parseFloat($("gamma").value).toFixed(1); });
   $("tmax").addEventListener("input", () => { $("tmax-val").textContent = $("tmax").value; });
+  $("theta").addEventListener("change", () => recalcular(true));
+  $("gamma").addEventListener("change", () => recalcular(true));
+  $("tmax").addEventListener("change", () => recalcular(false));
   $("tmicro").addEventListener("input", () => { $("tmicro-val").textContent = $("tmicro").value; });
   $("tmicro").addEventListener("change", compile);
   $("play-btn").addEventListener("click", () => {
@@ -572,6 +646,11 @@ function bindUI() {
   $("casc-btn").addEventListener("click", runCascade);
   $("casc-stop").addEventListener("click", stopCascade);
   $("cmp-btn").addEventListener("click", runComparison);
+  $("casc-fig-btn").addEventListener("click", () => abrirFiguras("paso"));
+  $("micro-fig-btn").addEventListener("click", () => { if (state.micro) abrirFiguras("micro"); });
+  $("fig-close").addEventListener("click", () => $("fig-dialog").close());
+  $("fig-step").addEventListener("change", dibujarFiguras);
+  document.querySelectorAll('input[name="fig-vista"]').forEach((r) => r.addEventListener("change", dibujarFiguras));
   $("tau").addEventListener("input", () => {
     $("tau-val").textContent = $("tau").value;
     $("tau").setAttribute("aria-valuetext", `τ = ${$("tau").value}`);

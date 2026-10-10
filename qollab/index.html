@@ -57,7 +57,7 @@
           <output class="mono" id="time-label" for="timeline">t = 0.0</output>
         </div>
         <div class="row small">
-          <label class="toggle"><input type="checkbox" id="relative" checked /> escala relativa</label>
+          <label class="toggle" title="Relativa: la neurona más probable brilla con intensidad P(disparo). Absoluta: brillo = √P."><input type="checkbox" id="relative" checked /> escala relativa</label>
           <label class="toggle"><input type="checkbox" id="show-edges" checked /> sinapsis</label>
           <label class="toggle">velocidad
             <select id="speed"><option value="0.5">0.5×</option><option value="1" selected>1×</option><option value="2">2×</option></select>
@@ -137,6 +137,7 @@
           <summary>Cadena de spikes</summary>
           <ol class="casc-log" id="casc-log"></ol>
         </details>
+        <button type="button" class="btn" id="casc-fig-btn" disabled>Ver circuitos de la cascada en Qiskit (mpl)</button>
         <details class="data-box" id="cmp-box">
           <summary>¿Qué cambia al medir? Coherente · medido · clásico</summary>
           <p class="hint">Mismo láser y mismo τ. El walk <b>coherente</b> no se mide; el <b>medido</b> se mide cada τ en la red completa;
@@ -186,6 +187,7 @@
           <summary>Circuito Qiskit <span class="mono" id="circ-count"></span></summary>
           <pre class="qiskit-text" id="qiskit-text" tabindex="0" aria-label="Dibujo en texto del circuito Qiskit"></pre>
         </details>
+        <button type="button" class="btn" id="micro-fig-btn">Ver circuito en Qiskit (mpl)</button>
       </div>
 
       <div class="card run">
@@ -206,6 +208,33 @@
     <span>Datos: Cook et al. 2019 · OpenWorm · ejes transversales ×1.4</span>
     <span class="attribution">This effort is supported by Qollab &amp; IonQ.</span>
   </footer>
+
+  <dialog class="fig-dialog" id="fig-dialog" aria-labelledby="fig-title">
+    <header class="fig-head">
+      <h2 id="fig-title">Circuito en Qiskit</h2>
+      <button type="button" class="icon-btn" id="fig-close" aria-label="Cerrar">
+        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 6l12 12M18 6L6 18" /></svg>
+      </button>
+    </header>
+    <div class="fig-controls" id="fig-controls">
+      <label class="toggle" for="fig-step">paso</label>
+      <select id="fig-step"></select>
+      <fieldset class="seg" id="fig-vista">
+        <legend class="sr-only">Vista del circuito</legend>
+        <label><input type="radio" name="fig-vista" value="compacta" checked /><span>Compacta (e<sup>−iτH</sup>)</span></label>
+        <label><input type="radio" name="fig-vista" value="expandida" /><span>Expandida (Trotter)</span></label>
+      </fieldset>
+    </div>
+    <p class="hint" id="fig-estado" aria-live="polite"></p>
+    <figure class="fig-box">
+      <div class="fig-scroll"><img id="fig-circ" alt="" /></div>
+      <figcaption class="hint" id="fig-circ-cap"></figcaption>
+    </figure>
+    <figure class="fig-box">
+      <div class="fig-scroll"><img id="fig-hist" alt="" /></div>
+      <figcaption class="hint" id="fig-hist-cap"></figcaption>
+    </figure>
+  </dialog>
 
   <div class="sr-only" id="sr-status" aria-live="polite"></div>
   <div class="toast" id="toast" role="status" aria-live="polite"></div>

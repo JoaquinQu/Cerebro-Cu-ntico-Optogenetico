@@ -176,6 +176,24 @@
 .run .result { margin-top: 10px; font-size: 12px; color: var(--muted); }
 .run .result b { color: var(--text); }
 .run .result code { font-family: var(--mono); font-size: 11px; color: var(--accent); word-break: break-all; }
+#casc-fig-btn, #micro-fig-btn { margin-top: 10px; }
+
+/* ---------- figuras de Qiskit (matplotlib) ---------- */
+.fig-dialog { width: min(1100px, calc(100vw - 32px)); max-height: calc(100vh - 32px); padding: 16px 18px;
+  background: var(--panel-solid); color: var(--text); border: 1px solid var(--panel-border); border-radius: var(--radius);
+  font-family: var(--font); font-size: 14px; }
+.fig-dialog::backdrop { background: rgba(2, 3, 8, 0.75); }
+.fig-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.fig-head h2 { margin: 0; font-size: 16px; }
+#fig-close svg { fill: none; stroke: currentColor; stroke-width: 2.2; }
+.fig-controls { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-top: 10px; }
+.fig-controls[hidden] { display: none; }
+.fig-controls select { min-width: 220px; }
+.fig-controls .seg { min-width: 300px; margin: 0; border: 0; }
+.fig-box { margin: 12px 0 0; }
+.fig-scroll { overflow: auto; max-height: 60vh; background: #262626; border-radius: 10px; padding: 6px; }
+.fig-scroll img { display: block; max-width: 100%; height: auto; }
+.fig-scroll img:not([src]) { display: none; }
 
 /* ---------- pie y flotantes ---------- */
 .footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; padding: 8px 18px 14px; font-size: 11.5px; color: var(--faint); }
