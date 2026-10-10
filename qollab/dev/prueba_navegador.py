@@ -34,22 +34,54 @@ def main():
         pag.wait_for_function("document.querySelector('#chips').children.length > 0", timeout=60000)
         pag.wait_for_timeout(2500)
         assert pag.inner_text("#m-top") not in ("", "—"), "el quantum walk no se dibujó"
+        assert pag.is_visible("#chap-1") and not pag.is_visible("#chap-2"), "sólo debe verse el capítulo 1"
+        print("narración 1:", pag.inner_text("#narr-text")[:140])
         pag.screenshot(path=str(out / "1_inicio.png"))
+        # ayuda "?" y ajustes de laboratorio
+        pag.click('button.help[data-help="theta"]')
+        assert pag.is_visible("#help-pop"), "la ayuda no se abrió"
+        pag.keyboard.press("Escape")
+        assert not pag.is_visible("#help-pop"), "Esc debe cerrar la ayuda"
+        pag.click("#lab-btn")
+        assert pag.is_visible("#gamma"), "el cajón de laboratorio no se abrió"
+        pag.screenshot(path=str(out / "1b_lab.png"))
+        pag.keyboard.press("Escape")
+        assert not pag.is_visible("#lab"), "Esc debe cerrar el laboratorio"
+        # capítulo 3 · circuito; las pestañas se mueven con flechas
+        pag.focus("#tab-1")
+        pag.keyboard.press("ArrowLeft")
+        assert pag.is_visible("#chap-3"), "← desde la pestaña 1 debe ir a la 3"
         pag.click("#run-btn")
         pag.wait_for_selector("#run-result table", timeout=60000)
         print("backend local:", pag.inner_text("#run-result").splitlines()[0])
         pag.click("#run-btn")  # local: se puede volver a ejecutar
         pag.wait_for_selector("#run-result table", timeout=60000)
-        pag.locator("#panel-q").scroll_into_view_if_needed()
         pag.screenshot(path=str(out / "2_backend_local.png"))
         print("estado SR:", pag.inner_text("#sr-status"))
 
         # 1b) cascada cuántica: 6 pasos, cada uno un circuito en el backend
+        pag.click("#lab-btn")
         pag.fill("#casc-pasos", "6")
+        pag.click("#lab-close")
+        pag.click("#tab-2")
+        pag.focus("#scene")
+        for _ in range(4):
+            pag.keyboard.press("+")
         pag.click("#casc-btn")
+        pag.wait_for_function("document.querySelectorAll('#casc-log li').length > 0", timeout=120000)
+        pag.wait_for_function("document.querySelector('#narr-kicker').textContent.includes('superposition')", timeout=60000)
+        pag.wait_for_timeout(300)
+        pag.screenshot(path=str(out / "4a_superposicion.png"))
+        pag.wait_for_timeout(900)
+        pag.screenshot(path=str(out / "4a2_colapsando.png"))
+        pag.wait_for_function("document.querySelector('#narr-kicker').textContent.includes('measured')", timeout=60000)
+        pag.wait_for_timeout(150)
+        pag.screenshot(path=str(out / "4b_colapso.png"))
         pag.wait_for_function("document.querySelector('#casc-stop').disabled && "
                               "document.querySelectorAll('#casc-log li').length > 0", timeout=120000)
+        assert pag.is_visible("#mini-circ svg"), "falta el circuito del paso"
         print("cascada:", pag.inner_text("#casc-estado"))
+        print("narración 2:", pag.inner_text("#narr-text")[:160])
         pag.click("#cmp-box summary")
         pag.click("#cmp-btn")
         pag.wait_for_selector("#cmp-dist svg", timeout=60000)
@@ -60,15 +92,19 @@ def main():
         pag.screenshot(path=str(out / "5_comparacion.png"))
 
         # 2) Givens + otro preset
+        pag.click("#tab-3")
         pag.select_option("#preset", "toque-bilateral-10")
         pag.check('input[value="givens"]', force=True)
         pag.wait_for_function("document.querySelector('#compile-btn').disabled === false && "
                               "document.querySelector('#chips').textContent.includes('Givens')", timeout=60000)
         print("givens:", pag.inner_text("#chips").replace("\n", " "))
+        pag.wait_for_timeout(500)
+        pag.screenshot(path=str(out / "6_circuito.png"))
 
         # 3) IonQ imitado: un job por ejecución
         pag.goto(a.url + "/?backend=ionq")
         pag.wait_for_function("document.querySelector('#chips').children.length > 0", timeout=60000)
+        pag.click("#tab-3")
         print("pill:", pag.inner_text("#backend-pill"))
         pag.click("#run-btn")
         pag.wait_for_selector("#run-result table", timeout=60000)
@@ -80,11 +116,13 @@ def main():
         # 4) hardware imitado: pide confirmación
         pag.goto(a.url + "/?backend=qpu")
         pag.wait_for_function("document.querySelector('#chips').children.length > 0", timeout=60000)
+        pag.click("#tab-3")
         pag.click("#run-btn")
         assert "Confirm" in pag.inner_text("#run-btn"), "falta la confirmación de hardware"
         print("qpu: pide confirmación ✓")
 
         # 5) teclado y pantalla angosta
+        pag.click("#tab-1")
         pag.focus("#scene")
         pag.keyboard.press("ArrowRight")
         print("teclado:", pag.inner_text("#time-label"))

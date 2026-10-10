@@ -36,6 +36,29 @@ const state = {
 
 // Estado de la cascada cuántica
 const cascade = { running: false, stop: false, armed: false, centers: [], steps: [] };
+// Capítulo visible (1 luz · 2 medir · 3 circuito) y narración guardada por capítulo
+const ui = { chapter: 1, narr: {}, adj: [] };
+const sleep = (ms) => new Promise((ok) => setTimeout(ok, ms));
+
+const HELP = {
+  theta: "θ is the light dose. The laser is an RX(θ) rotation on the neuron's qubit: θ = π always fires it, " +
+    "θ = π/2 fires it half of the time. It scales how bright the response is, not its shape.",
+  participation: "How many neurons share the excitation at this moment (the inverse participation ratio). " +
+    "1 means it is all on one neuron; 302 would mean spread evenly over the whole worm.",
+  tau: "τ is how long the excitation evolves as a wave before we measure it. Each measurement collapses the wave onto " +
+    "one neuron. Measure too often (small τ) and the wave never gets to move: that is the quantum Zeno effect.",
+  gamma: "γ is the strength of every synapse in the Hamiltonian H = γ Σ J_ij (XX + YY)/2. " +
+    "Doubling γ makes everything happen twice as fast.",
+  shots: "A shot is one run of the circuit followed by one measurement. Quantum results are random, so the circuit " +
+    "is repeated many times and we count how often each neuron came out as 1.",
+  trotter: "The evolution e^(−iHt) is not a single gate. Trotter splits it into short steps of two-qubit RXX·RYY gates " +
+    "(more steps: more accurate, but more gates and more noise). Givens skips the time steps and prepares the final " +
+    "state directly, with fewer gates.",
+  postsel: "With one laser, at most one neuron can be excited. Shots with two or more 1s can only come from hardware " +
+    "noise, so they are discarded. It is a cheap form of error mitigation.",
+  tvd: "Total variation distance: how different two probability distributions are. 0 means identical, " +
+    "1 means completely different. Below about 0.05 is a very good match.",
+};
 const DOS_QUBITS = new Set(["rxx", "ryy", "rzz", "rzx", "cx", "cz", "ecr", "ms", "zz", "swap", "iswap", "xx_plus_yy"]);
 
 const scene = new WormScene($("scene"), { quality: "auto" });
@@ -75,31 +98,200 @@ function neuronCard(name) {
     `anteroposterior position: ${d.y.toFixed(0)} µm`;
 }
 
+// ------------------------------------------------------------------ narración
+/** Texto "qué estás viendo" sobre la escena. Se guarda por capítulo y se muestra el del visible. */
+function narrate(ch, kicker, html, tone = "") {
+  ui.narr[ch] = { kicker, html, tone };
+  if (ch === ui.chapter) showNarration();
+}
+function showNarration() {
+  const n = ui.narr[ui.chapter] ?? { kicker: "", html: "" };
+  $("narr-kicker").textContent = n.kicker;
+  $("narr-text").innerHTML = n.html;
+  $("narration").className = `narration ${n.tone}`;
+  $("narration").hidden = !n.html;
+}
+
+/** Distancias en sinapsis desde una neurona (BFS sobre el conectoma completo). */
+function graphDistances(src) {
+  const d = new Int16Array(state.neurons.length).fill(-1);
+  d[src] = 0;
+  const q = [src];
+  for (let h = 0; h < q.length; h++) {
+    for (const v of ui.adj[q[h]]) if (d[v] < 0) { d[v] = d[q[h]] + 1; q.push(v); }
+  }
+  return d;
+}
+
+/** Busca un ejemplo concreto de interferencia: una neurona lejana más brillante que un vecino directo. */
+function interferenceExample(W) {
+  const src = state.index.get(W.source);
+  const n = state.neurons.length, F = W.prob.length;
+  const avg = new Float64Array(n);
+  for (const row of W.prob) for (let k = 0; k < n; k++) avg[k] += row[k] / F;
+  const d = graphDistances(src);
+  let near = -1, far = -1;
+  for (let k = 0; k < n; k++) {
+    if (d[k] === 1 && (near < 0 || avg[k] < avg[near])) near = k;
+    if (d[k] >= 2 && (far < 0 || avg[k] > avg[far])) far = k;
+  }
+  if (near < 0 || far < 0 || avg[far] <= 1.5 * avg[near]) return null;
+  return { near: state.neurons[near].name, far: state.neurons[far].name, hops: d[far],
+    ratio: avg[far] / Math.max(avg[near], 1e-9), neighbours: d.filter((v) => v === 1).length };
+}
+
+function narrateWalk() {
+  const W = state.walk;
+  const ex = interferenceExample(W);
+  const lead = `<b>${esc(W.source)}</b> is lit. The excitation does not hop around like a ball: it spreads as a ` +
+    `<span class="q">wave</span> through every synapse at once, and the paths <b>add up or cancel</b>.`;
+  const tail = ex
+    ? ` Look at <b>${esc(ex.far)}</b>, ${ex.hops} synapses away: on average it glows ${ex.ratio >= 10 ? "over 10" : ex.ratio.toFixed(0)}× more than ` +
+      `<b>${esc(ex.near)}</b>, a direct neighbour. That is interference.`
+    : " Bright and dark spots that do not follow distance are interference.";
+  narrate(1, "What you're seeing · exact theory", lead + tail);
+}
+
+// ------------------------------------------------------------------ capítulos
+const TABS = [1, 2, 3].map((n) => $(`tab-${n}`));
+
+function setChapter(n, { focusTab = false } = {}) {
+  if (n === ui.chapter && !focusTab) return;
+  const prev = ui.chapter;
+  ui.chapter = n;
+  TABS.forEach((t, i) => {
+    const on = i + 1 === n;
+    t.setAttribute("aria-selected", String(on));
+    t.tabIndex = on ? 0 : -1;
+    $(`chap-${i + 1}`).hidden = !on;
+  });
+  if (focusTab) TABS[n - 1].focus();
+  closeHelp();
+  if (prev !== n) {
+    document.querySelector(".side").scrollTop = 0;
+    if (prev === 1) setPlaying(false);
+    restoreScene();
+  }
+  showNarration();
+}
+
+/** Pone la escena en el estado que corresponde al capítulo visible. */
+function restoreScene() {
+  const ch = ui.chapter;
+  $("mini-circ").hidden = !(ch === 2 && cascade.steps.length);
+  if (ch === 1) {
+    scene.setHighlight([]);
+    scene.setTrail(null);
+    if (state.walk && state.walk.source !== state.source) { fire(state.source); return; }
+    scene.setLabel(state.index.get(state.source), `⚡ ${state.source}`);
+    renderFrame(true);
+  } else if (ch === 2) {
+    const last = cascade.steps[cascade.steps.length - 1];
+    if (last && cascade.centers[0] === state.source) {
+      applyCascadeScene(last);
+    } else {
+      showSourceOnly();
+      if (!cascade.running) {
+        narrate(2, "Ready to measure", `The cascade starts from <b>${esc(state.source)}</b>. Each step builds a ` +
+          `<span class="q">10-qubit circuit</span>, lets the wave spread for a time τ, and then <span class="a">measures</span> it. ` +
+          "Press <b>Start cascade</b>.");
+      }
+    }
+  } else {
+    applyMicroScene();
+  }
+}
+
+function showSourceOnly() {
+  const vals = new Float32Array(state.neurons.length);
+  const i = state.index.get(state.source);
+  vals[i] = 1;
+  scene.setHighlight([]);
+  scene.setTrail(null);
+  scene.setActivity(vals);
+  scene.setLabel(i, `⚡ ${state.source}`);
+}
+
+/** Capítulo 2 o 3: elegir una neurona en el gusano sólo cambia la fuente (no lanza el walk). */
+function selectSource(name) {
+  stopCascade();
+  state.source = name;
+  $("neuron-input").value = name;
+  neuronCard(name);
+  cascadeLabel();
+  if (ui.chapter === 2) restoreScene();
+  announce(`Source neuron: ${name}.`);
+}
+
+// ------------------------------------------------------------------ ayuda "?" y ajustes
+function openHelp(btn) {
+  const pop = $("help-pop");
+  if (!pop.hidden && openHelp._btn === btn) { closeHelp(); return; }
+  closeHelp();
+  const text = HELP[btn.dataset.help] ?? "";
+  $("help-text").textContent = text;
+  pop.hidden = false;
+  const app = $("app").getBoundingClientRect(), r = btn.getBoundingClientRect();
+  const w = pop.offsetWidth;
+  pop.style.left = `${Math.max(8, Math.min(app.width - w - 8, r.left - app.left - w / 2 + 8))}px`;
+  pop.style.top = `${r.bottom - app.top + 8}px`;
+  btn.setAttribute("aria-expanded", "true");
+  openHelp._btn = btn;
+  announce(text);
+}
+function closeHelp({ refocus = false } = {}) {
+  const pop = $("help-pop");
+  if (pop.hidden) return;
+  pop.hidden = true;
+  const b = openHelp._btn;
+  openHelp._btn = null;
+  if (b) { b.setAttribute("aria-expanded", "false"); if (refocus) b.focus(); }
+}
+
+function setLab(open) {
+  $("lab").hidden = !open;
+  $("lab-btn").setAttribute("aria-expanded", String(open));
+  if (open) {
+    document.querySelector(".side").scrollTop = 0;
+    $("lab-close").focus();
+  } else {
+    $("lab-btn").focus();
+  }
+}
+
 // ------------------------------------------------------------------ 1 · láser
 async function fire(name = $("neuron-input").value.trim().toUpperCase()) {
   if (!state.index.has(name)) { toast(`There is no neuron "${name}"`, true); return; }
   stopCascade();
-  scene.setTrail(null);
   state.source = name;
   cascadeLabel();
   $("neuron-input").value = name;
   neuronCard(name);
   const idx = state.index.get(name);
   const p = params();
+  const visible = ui.chapter === 1; // en otros capítulos se recalcula sin tocar la escena
   $("fire-btn").disabled = true;
-  scene.setLabel(idx, `⚡ ${name}`);
-  scene.fireLaser(idx, Math.sin(p.theta / 2) ** 2);
+  if (visible) {
+    scene.setTrail(null);
+    scene.setHighlight([]);
+    scene.setLabel(idx, `⚡ ${name}`);
+    scene.fireLaser(idx, Math.sin(p.theta / 2) ** 2);
+    narrate(1, "Laser on", `Firing the laser at <b>${esc(name)}</b>…`);
+  }
   await respirar();
   try {
     state.walk = await py.walk({ fuente: name, theta: p.theta, gamma: p.gamma, t_max: p.t_max, cuadros: 160 });
     state.frame = 0;
     describeWalk();
-    if (REDUCED) {
+    narrateWalk();
+    if (!visible) {
+      state.frame = state.walk.prob.length - 1;
+    } else if (REDUCED) {
       // Sin animación automática: se muestra un instante intermedio y se reproduce a pedido.
       state.frame = Math.round((state.walk.prob.length - 1) * 0.3);
       renderFrame(true);
     } else {
-      setTimeout(() => setPlaying(true), 450);
+      setTimeout(() => { if (ui.chapter === 1) setPlaying(true); }, 450);
     }
     const pr = selectedPreset();
     if (pr && pr.neuronas.includes(name) && state.micro && state.micro.fuente !== name) compile();
@@ -123,6 +315,7 @@ function describeWalk() {
 }
 
 function setPlaying(v) {
+  if (v && ui.chapter !== 1) v = false;
   state.playing = v;
   scene.setContinuous(v);
   $("play-btn").setAttribute("aria-pressed", String(v));
@@ -154,7 +347,7 @@ function renderFrame(force = false) {
   const rel = $("relative").checked;
   const vals = (renderFrame._vals ??= new Float32Array(P.length));
   for (let k = 0; k < P.length; k++) vals[k] = Math.min(1, rel ? (pfire * P[k]) / Math.max(max, 1e-12) : Math.sqrt(P[k]));
-  scene.setActivity(vals);
+  if (ui.chapter === 1) scene.setActivity(vals);
   $("time-label").textContent = `t = ${t.toFixed(1)}`;
   // El DOM de texto se actualiza ~8 veces por segundo (la escena va a 60 fps)
   const now = performance.now();
@@ -238,16 +431,18 @@ async function runCascade() {
   const tau = parseFloat($("tau").value);
   const { theta, gamma } = params();
   setPlaying(false);
+  closeHelp();
   Object.assign(cascade, { running: true, stop: false, centers: [state.source], steps: [] });
   $("casc-btn").disabled = true;
   $("casc-stop").disabled = false;
   $("casc-fig-btn").disabled = true;
   $("casc-log").innerHTML = "";
-  scene.setTrail(null);
   let centro = state.source;
   const idx0 = state.index.get(centro);
-  scene.setLabel(idx0, `⚡ ${centro}`);
+  showSourceOnly();
   scene.fireLaser(idx0, Math.sin(theta / 2) ** 2);
+  narrate(2, "Step 1 · laser", `The laser excites <b>${esc(centro)}</b> with RX(θ). Sending its 10-qubit circuit to ` +
+    `<b>${esc(state.backend.nombre)}</b>…`);
   if (ionq) toast("IonQ accepts one job per run: only the first step will run.");
   let fin = "completa";
   try {
@@ -258,17 +453,26 @@ async function runCascade() {
       const params = { centro, theta: k === 1 ? theta : Math.PI, tau, gamma, pasos_trotter: trotterReps(tau) };
       const r = await py.paso(BACKEND, { ...params, shots });
       r.params = params;
+      r.k = k;
+      r.shots = shots;
       state.jobsSent++;
       cascade.steps.push(r);
-      const salto = r.spike && r.spike !== centro;
+      const salto = !!(r.spike && r.spike !== centro);
+      r.salto = salto;
       if (salto) cascade.centers.push(r.spike);
-      renderCascadeStep(r, k, total, salto);
+      renderCascadePanel(r, k, total);
+      if (ui.chapter === 2 && !REDUCED) {
+        narrateSuperposition(r);
+        await scene.collapse(r.ventana_indices, r.teoria_ventana, r.spike_indice);
+      }
+      if (ui.chapter === 2) applyCascadeScene(r);
+      narrateMeasurement(r);
       if (!r.spike) {
         fin = r.motivo_fin === "vacio" ? "vacio" : "perdida";
         break;
       }
       centro = r.spike;
-      if (!REDUCED) await new Promise((ok) => setTimeout(ok, salto ? 700 : 180));
+      if (!REDUCED) await sleep(salto ? 600 : 250);
     }
   } catch (e) {
     fin = "error";
@@ -285,24 +489,70 @@ async function runCascade() {
     const motivo = { completa: "", detenida: " (stopped)", error: " (error)",
       vacio: ": the neuron did not fire (shot with no excitation)", perdida: ": no valid shot left" }[fin];
     const msg = `Cascade${motivo}. ${n} circuits run, ${saltos} jumps: ${cascade.centers.join(" → ")}.`;
+    if (n) {
+      narrate(2, "Cascade finished", `<b>${n}</b> circuits, <b>${saltos}</b> jumps: ` +
+        `<span class="a">${cascade.centers.map(esc).join(" → ")}</span>. ` +
+        (saltos <= 1 && tau <= 4
+          ? "With such a short τ, measuring keeps pinning the spike in place: the quantum Zeno effect. Try τ = 8."
+          : "Each jump was decided by one measurement. Open <b>What changes when you measure?</b> to compare with the unmeasured wave."),
+      "collapse");
+    }
     $("casc-estado").textContent = msg + (bloqueado ? " For another job on IonQ, press Stop and Run." : "");
     announce(msg);
   }
 }
 
-function renderCascadeStep(r, k, total, salto) {
+/** Escena tras la medida: la neurona medida brilla; el resto de la ventana queda tenue y con anillo. */
+function applyCascadeScene(r) {
   const N = state.neurons.length;
   const vals = new Float32Array(N);
   const max = Math.max(...r.medida, 1e-9);
-  r.ventana_indices.forEach((g, i) => { vals[g] = 0.15 + 0.85 * (r.medida[i] / max); });
+  r.ventana_indices.forEach((g, i) => { vals[g] = 0.05 + 0.3 * (r.medida[i] / max); });
   if (r.spike_indice != null) vals[r.spike_indice] = 1;
   scene.setActivity(vals);
   scene.setHighlight(r.ventana_indices);
   scene.setTrail(cascade.centers.map((nm) => state.index.get(nm)));
-  if (r.spike_indice != null) {
-    scene.setLabel(r.spike_indice, `⚡ ${r.spike}`);
-    if (salto) scene.fireLaser(r.spike_indice, 0.6);
+  const lab = r.spike_indice ?? r.ventana_indices[0];
+  scene.setLabel(lab, r.spike ? `⚡ ${r.spike}` : `∅ ${r.centro}`);
+}
+
+/** Probabilidades de la ventana normalizadas entre neuronas (sin el vacío). */
+function windowProbs(values) {
+  const s = values.reduce((a, b) => a + b, 0) || 1;
+  return values.map((v) => v / s);
+}
+
+function narrateSuperposition(r) {
+  const p = windowProbs(r.teoria_ventana);
+  const top = p.map((v, i) => [v, i]).sort((a, b) => b[0] - a[0]).slice(0, 3)
+    .map(([v, i]) => `${esc(r.ventana[i])} ${pct(v)}`).join(", ");
+  narrate(2, `Step ${r.k} · superposition`, `Before measuring, the excitation is in <span class="q">all 10 neurons at once</span> ` +
+    `(${top}…). The measurement will pick one.`);
+}
+
+function narrateMeasurement(r) {
+  const i = r.spike ? r.ventana.indexOf(r.spike) : -1;
+  const share = i >= 0 ? pct(r.medida[i] / Math.max(1e-9, r.medida.reduce((a, b) => a + b, 0))) : "";
+  let html;
+  if (!r.spike) {
+    html = r.motivo_fin === "vacio"
+      ? `Measured: <b>no neuron fired</b>. The light did not excite ${esc(r.centro)} in this shot ` +
+        "(that happens with probability cos²(θ/2)). The cascade stops."
+      : "Measured: no valid shot was left after post-selection. The cascade stops.";
+  } else if (r.salto) {
+    html = `Measured! The wave <span class="a">collapsed onto ${esc(r.spike)}</span>, which came out as 1 in ${share} of the shots. ` +
+      `${esc(r.spike)} fires and starts step ${r.k + 1}.`;
+  } else {
+    html = `It collapsed back onto <b>${esc(r.spike)}</b> itself (${share} of the shots). ` +
+      ((r.params?.tau ?? 8) <= 4
+        ? "With a short τ this is likely: measuring often freezes the walk (Zeno effect)."
+        : "The wave had not fully left yet, so staying put was the most likely outcome. It tries again.");
   }
+  narrate(2, `Step ${r.k} · measured`, html, "collapse");
+}
+
+function renderCascadePanel(r, k, total) {
+  const salto = r.salto;
   const twoq = dosQubits(r.ops_transpilado) || dosQubits(r.ops_escritas);
   $("casc-chips").innerHTML = [
     `<span class="chip">step <b>${k}/${total}</b></span>`,
@@ -320,6 +570,7 @@ function renderCascadeStep(r, k, total, salto) {
   groupedBars($("casc-bars"), r.ventana, series, { highlight: [0] });
   $("casc-legend").innerHTML = series.map((s) => `<span><i style="background:${SERIES_COLORS[s.key]}"></i>${esc(s.name)}</span>`).join("");
   dataTable($("casc-table"), r.ventana, series, `Window centred on ${r.centro}, step ${k}`);
+  drawMiniCircuit(r);
   const li = document.createElement("li");
   li.innerHTML = salto
     ? `<b>${esc(r.centro)}</b> <span class="salto">→ ${esc(r.spike)}</span> · valid ${pct(r.fraccion_valida)}`
@@ -327,8 +578,40 @@ function renderCascadeStep(r, k, total, salto) {
       ? `<b>${esc(r.centro)}</b> stays (the spike came out on the centre)`
       : `<b>${esc(r.centro)}</b> · no spike`;
   $("casc-log").appendChild(li);
-  li.scrollIntoView({ block: "nearest" });
+  $("casc-log").scrollTop = $("casc-log").scrollHeight; // sin mover el panel entero
   if (salto) announce(`Step ${k}: ${r.spike} fires.`);
+}
+
+/** Circuito del paso dibujado al instante en SVG (sin matplotlib): RX → e^{−iτH} → medidas → bits. */
+function drawMiniCircuit(r) {
+  const names = r.ventana, n = names.length;
+  const hot = r.spike ? names.indexOf(r.spike) : -1;
+  const dy = 16, y0 = 12, H = y0 + dy * (n - 1) + 14, W = 280;
+  const x = { wire0: 46, rx: 54, u0: 96, u1: 162, m: 176, bit: 214, end: 204 };
+  const gate1 = r.k === 1 ? "RX(θ)" : "X";
+  const reps = r.params?.pasos_trotter ?? 1;
+  let g = "";
+  names.forEach((nm, i) => {
+    const y = y0 + i * dy, h = i === hot ? " hot" : "";
+    g += `<text x="${x.wire0 - 4}" y="${y + 3}" text-anchor="end" class="${h.trim()}">${esc(nm)}</text>`;
+    g += `<line class="w${h}" x1="${x.wire0}" y1="${y}" x2="${x.end}" y2="${y}"/>`;
+    g += `<rect class="meter${h}" x="${x.m}" y="${y - 6}" width="18" height="12" rx="2"/>` +
+      `<path d="M${x.m + 3} ${y + 3} Q${x.m + 9} ${y - 5} ${x.m + 15} ${y + 3}" fill="none" stroke="currentColor" class="w${h}"/>`;
+    const bit = i === hot ? "1" : "0";
+    g += `<text x="${x.bit}" y="${y + 3}" class="${h.trim()}">${bit}${i === hot ? " ← fires" : ""}</text>`;
+  });
+  g += `<rect class="gate" x="${x.rx}" y="${y0 - 7}" width="34" height="14" rx="3"/>` +
+    `<text class="gate-t" x="${x.rx + 17}" y="${y0 + 3}" text-anchor="middle">${gate1}</text>`;
+  g += `<rect class="gate-u" x="${x.u0}" y="${y0 - 8}" width="${x.u1 - x.u0}" height="${H - y0 - 4}" rx="5"/>` +
+    `<text class="gate-t big" x="${(x.u0 + x.u1) / 2}" y="${H / 2 - 4}" text-anchor="middle">e<tspan dy="-6" font-size="9">−iτH</tspan></text>` +
+    `<text x="${(x.u0 + x.u1) / 2}" y="${H / 2 + 12}" text-anchor="middle">τ = ${r.params?.tau ?? ""}</text>` +
+    `<text x="${(x.u0 + x.u1) / 2}" y="${H / 2 + 23}" text-anchor="middle">${reps} Trotter</text>`;
+  const desc = `Circuit of step ${r.k}: ${n} qubits (${names.join(", ")}). ${gate1} on ${names[0]}, then the XY evolution ` +
+    `e^(−iτH) with ${reps} Trotter step${reps > 1 ? "s" : ""}, then all qubits are measured. ` +
+    (hot >= 0 ? `Chosen shot: ${names[hot]} = 1, all others 0.` : "Chosen shot: all 0, no neuron fired.");
+  $("mini-circ-svg").innerHTML = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(desc)}">${g}</svg>`;
+  $("mini-circ-cap").textContent = `· step ${r.k} · ${r.shots ?? ""} shots`;
+  $("mini-circ").hidden = ui.chapter !== 2;
 }
 
 const CMP = [
@@ -440,7 +723,40 @@ function renderMicro() {
   } else {
     $("qiskit-text").textContent = "Qiskit is not available in this environment.";
   }
-  scene.setHighlight(labels.map((nm) => state.index.get(nm)).filter((i) => i != null));
+  if (ui.chapter === 3) applyMicroScene();
+  narrateMicro();
+}
+
+/** Capítulo 3: las neuronas del microcircuito brillan según la teoría exacta a tiempo t. */
+function applyMicroScene() {
+  const r = state.micro;
+  if (!r) { scene.setHighlight([]); scene.setTrail(null); return; }
+  const vals = new Float32Array(state.neurons.length);
+  const max = Math.max(...r.exacta, 1e-9);
+  const idx = r.neuronas.map((nm) => state.index.get(nm));
+  idx.forEach((g, i) => { if (g != null) vals[g] = 0.12 + 0.88 * (r.exacta[i] / max); });
+  scene.setTrail(null);
+  scene.setActivity(vals);
+  scene.setHighlight(idx.filter((i) => i != null));
+  scene.setLabel(state.index.get(r.fuente), `⚡ ${r.fuente}`);
+}
+
+function narrateMicro() {
+  const r = state.micro;
+  if (!r) return;
+  const m = state.medido;
+  const fila = m ? m.resultados[m.resultados.length - 1] : null;
+  const how = r.modo === "trotter" ? `${r.pasos} Trotter steps` : `${r.saltos.length} Givens rotations`;
+  let html = `<b>${r.n_qubits} qubits</b>, one per neuron of this reflex circuit (ringed on the worm). ` +
+    `The laser on <b>${esc(r.fuente)}</b> is followed by ${how}: <b>${r.recursos.compuertas_2q}</b> two-qubit gates. ` +
+    `The ideal circuit matches exact theory with TVD <b>${r.tvd_circuito.toFixed(3)}</b> (0 = identical).`;
+  if (fila) {
+    html += ` On <span class="a">${esc(m.backend)}</span> it measured TVD <b>${fila.tvd_postseleccion.toFixed(3)}</b> after discarding ` +
+      `${pct(1 - fila.fraccion_aceptada)} of noisy shots.`;
+  } else if (r.ruido) {
+    html += ` With IonQ-like noise, ${pct(1 - r.ruido.fraccion_aceptada)} of shots break the symmetry and are discarded.`;
+  }
+  narrate(3, fila ? "Measured on the backend" : "What you're seeing · the circuit", html, fila ? "collapse" : "");
 }
 
 // ------------------------------------------------------------------ 3 · backend
@@ -562,7 +878,7 @@ async function dibujarFiguras() {
   const turno = ++fig.turno;
   $("fig-estado").textContent = p.vista === "expandida"
     ? "Drawing with Qiskit… the expanded view has hundreds of gates and takes a few seconds."
-    : "Drawing with Qiskit…";
+    : `Drawing with Qiskit…${fig.cache.size ? "" : " The first figure takes about 30 s while matplotlib loads."}`;
   await respirar();
   try {
     let f = fig.cache.get(clave);
@@ -656,13 +972,50 @@ function bindUI() {
     $("tau").setAttribute("aria-valuetext", `τ = ${$("tau").value}`);
   });
 
+  // capítulos (pestañas con flechas, Inicio y Fin)
+  TABS.forEach((t, i) => {
+    t.addEventListener("click", () => setChapter(i + 1));
+    t.addEventListener("keydown", (e) => {
+      const n = { ArrowRight: i + 2, ArrowLeft: i, Home: 1, End: 3 }[e.key];
+      if (n === undefined) return;
+      e.preventDefault();
+      setChapter(((n - 1 + 3) % 3) + 1, { focusTab: true });
+    });
+  });
+  document.querySelectorAll("[data-goto]").forEach((b) => b.addEventListener("click", () => {
+    setChapter(parseInt(b.dataset.goto, 10), { focusTab: true });
+  }));
+  // ayuda
+  document.querySelectorAll("button.help").forEach((b) => {
+    b.setAttribute("aria-expanded", "false");
+    b.setAttribute("aria-controls", "help-pop");
+    b.addEventListener("click", (e) => { e.stopPropagation(); openHelp(b); });
+  });
+  document.addEventListener("click", (e) => { if (!e.target.closest("#help-pop")) closeHelp(); });
+  document.querySelector(".side").addEventListener("scroll", () => closeHelp(), { passive: true });
+  // ajustes de laboratorio
+  $("lab-btn").addEventListener("click", () => setLab($("lab").hidden));
+  $("lab-close").addEventListener("click", () => setLab(false));
+  document.addEventListener("keydown", (e) => {
+    if (e.key !== "Escape") return;
+    if (!$("help-pop").hidden) { closeHelp({ refocus: true }); e.preventDefault(); return; }
+    if (!$("lab").hidden && $("lab").contains(document.activeElement)) { setLab(false); e.preventDefault(); }
+  });
+
   scene.on("key", (e) => {
     if (e.key === " " || e.key === "k") { $("play-btn").click(); return true; }
     if (e.key === "ArrowRight") { stepFrames(e.shiftKey ? 16 : 4); return true; }
     if (e.key === "ArrowLeft") { stepFrames(e.shiftKey ? -16 : -4); return true; }
     return false;
   });
-  scene.on("pick", (i) => fire(state.neurons[i].name));
+  scene.on("pick", (i) => {
+    const name = state.neurons[i].name;
+    if (ui.chapter === 1) { fire(name); return; }
+    if (ui.chapter === 2) { if (!cascade.running) selectSource(name); return; }
+    const pr = selectedPreset();
+    if (pr && pr.neuronas.includes(name)) { state.source = name; neuronCard(name); cascadeLabel(); compile(); }
+    else toast(`${name} is not part of this microcircuit (${pr?.neuronas.join(", ")}).`);
+  });
   const tip = $("tooltip");
   scene.on("hover", (i, px) => {
     if (i < 0 || !px) { tip.classList.remove("show"); return; }
@@ -685,14 +1038,16 @@ async function init() {
   try {
     loaderText.textContent = "Reading the Cook et al. (2019) connectome in Python…";
     await respirar();
-    const con = await py.conectoma();
+    const con = await py.conectoma(6000);
     state.neurons = con.neurons;
+    ui.adj = con.neurons.map(() => []);
+    for (const [i, j] of con.edges) { ui.adj[i].push(j); ui.adj[j].push(i); }
     con.neurons.forEach((d, i) => state.index.set(d.name, i));
     $("neuron-list").innerHTML = con.neurons.map((d) => `<option value="${d.name}">${TYPE_ES[d.type]}</option>`).join("");
     loaderText.textContent = "Loading the 3D body…";
     let glb = null;
     try { glb = await py.cuerpo(); } catch (e) { console.log(`No .glb body: ${e.message}`); }
-    scene.setData(con.neurons, con.edges, glb);
+    scene.setData(con.neurons, con.edges.slice(0, 1200), glb);
 
     const { microcircuitos } = await py.microcircuitos();
     state.presets = microcircuitos;
