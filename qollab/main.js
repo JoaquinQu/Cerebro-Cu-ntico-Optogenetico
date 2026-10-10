@@ -1,10 +1,10 @@
-// Cerebro Cuántico Optogenético · página Qollab (JS / Qiskit)
+// Optogenetic Quantum Brain · Qollab page (JS / Qiskit)
 //
-//  1. Láser → quantum walk exacto sobre las 302 neuronas (teoría, calculada en Python/numpy).
-//  2. Cascada cuántica → cada paso es un circuito Qiskit de 10 qubits (la neurona que disparó y
-//     sus 9 vecinas) ejecutado en el `backend` elegido; el spike medido dispara el paso siguiente.
-//  3. Microcircuito fijo → circuito Qiskit (RX + RXX·RYY): teoría, ideal y ruido, y UN job en el
-//     backend (simulador integrado, simuladores con ruido de IBM o IonQ, o el hardware IonQ Forte).
+//  1. Laser → exact quantum walk on the 302 neurons (theory, computed in Python/numpy).
+//  2. Quantum cascade → each step is a 10-qubit Qiskit circuit (the neuron that fired and its
+//     9 neighbours) run on the selected `backend`; the measured spike triggers the next step.
+//  3. Fixed microcircuit → Qiskit circuit (RX + RXX·RYY): theory, ideal and noisy, and ONE job on
+//     the backend (built-in simulator, IBM or IonQ noisy simulators, or IonQ Forte hardware).
 //
 // This effort is supported by Qollab & IonQ.
 import { QUALITY, WormScene } from "./js/escena.js";
@@ -12,7 +12,7 @@ import { dataTable, groupedBars, SERIES_COLORS, timeSeries } from "./js/graficos
 import { py, respirar } from "./js/python.js";
 
 const $ = (id) => document.getElementById(id);
-const TYPE_ES = { sensory: "sensorial", interneuron: "interneurona", motor: "motora", unknown: "—" };
+const TYPE_ES = { sensory: "sensory", interneuron: "interneuron", motor: "motor", unknown: "—" };
 const REDUCED = typeof matchMedia === "function" && matchMedia("(prefers-reduced-motion: reduce)").matches;
 // Qollab crea `backend` antes de correr main.js (no se elige ni se escribe en el código).
 const BACKEND = typeof backend !== "undefined" ? backend : null; // eslint-disable-line no-undef
@@ -66,18 +66,18 @@ const modo = () => document.querySelector('input[name="modo"]:checked').value;
 
 function neuronCard(name) {
   const i = state.index.get(name);
-  if (i == null) { $("neuron-card").textContent = "Neurona no encontrada"; return; }
+  if (i == null) { $("neuron-card").textContent = "Neuron not found"; return; }
   const d = state.neurons[i];
   const nt = d.neurotransmitters?.length ? d.neurotransmitters.join(", ") : "—";
   $("neuron-card").innerHTML =
     `<b>${esc(d.name)}</b><span class="tag ${d.type}">${TYPE_ES[d.type]}</span><br>` +
-    `${d.degree} conexiones · neurotransmisor: ${esc(nt)}<br>` +
-    `posición anteroposterior: ${d.y.toFixed(0)} µm`;
+    `${d.degree} connections · neurotransmitter: ${esc(nt)}<br>` +
+    `anteroposterior position: ${d.y.toFixed(0)} µm`;
 }
 
 // ------------------------------------------------------------------ 1 · láser
 async function fire(name = $("neuron-input").value.trim().toUpperCase()) {
-  if (!state.index.has(name)) { toast(`No existe la neurona "${name}"`, true); return; }
+  if (!state.index.has(name)) { toast(`There is no neuron "${name}"`, true); return; }
   stopCascade();
   scene.setTrail(null);
   state.source = name;
@@ -104,7 +104,7 @@ async function fire(name = $("neuron-input").value.trim().toUpperCase()) {
     const pr = selectedPreset();
     if (pr && pr.neuronas.includes(name) && state.micro && state.micro.fuente !== name) compile();
   } catch (e) {
-    toast(`Error en Python: ${e.message}`, true);
+    toast(`Python error: ${e.message}`, true);
   } finally {
     $("fire-btn").disabled = false;
   }
@@ -116,9 +116,9 @@ function describeWalk() {
   const last = W.prob[W.prob.length - 1];
   const order = Array.from(last.keys()).sort((a, b) => last[b] - last[a]).slice(0, 3);
   const top = order.map((k) => `${state.neurons[k].name} ${pct(last[k])}`).join(", ");
-  const msg = `Láser en ${W.source}, probabilidad de disparo ${pct(W.fire_probability)}. ` +
-    `Al final de la simulación las neuronas más probables son: ${top}.`;
-  $("scene").setAttribute("aria-label", `Gusano C. elegans en 3D. ${msg}`);
+  const msg = `Laser on ${W.source}, fire probability ${pct(W.fire_probability)}. ` +
+    `At the end of the simulation the most likely neurons are: ${top}.`;
+  $("scene").setAttribute("aria-label", `3D C. elegans worm. ${msg}`);
   announce(msg);
 }
 
@@ -126,7 +126,7 @@ function setPlaying(v) {
   state.playing = v;
   scene.setContinuous(v);
   $("play-btn").setAttribute("aria-pressed", String(v));
-  $("play-btn").setAttribute("aria-label", v ? "Pausar" : "Reproducir");
+  $("play-btn").setAttribute("aria-label", v ? "Pause" : "Play");
   $("play-icon").innerHTML = v ? '<path d="M7 5h4v14H7zM13 5h4v14h-4z"/>' : '<path d="M7 5l12 7-12 7z"/>';
 }
 
@@ -168,7 +168,7 @@ function renderFrame(force = false) {
   const order = Array.from(P.keys()).sort((a, b) => P[b] - P[a]).slice(0, 6);
   $("toplist").innerHTML = order.map((k) => {
     const nm = state.neurons[k].name;
-    return `<li><button type="button" data-n="${nm}" aria-label="${nm}: ${pct(P[k])}. Centrar la vista en ${nm}">` +
+    return `<li><button type="button" data-n="${nm}" aria-label="${nm}: ${pct(P[k])}. Center the view on ${nm}">` +
       `<span>${nm}</span><span class="bar" style="width:${(100 * P[k]) / Math.max(max, 1e-12)}%"></span>` +
       `<span class="p">${pct(P[k])}</span></button></li>`;
   }).join("");
@@ -200,7 +200,7 @@ function stepFrames(delta) {
   const { P, t } = frameValues(state.frame);
   let top = 0;
   for (let k = 0; k < P.length; k++) if (P[k] > P[top]) top = k;
-  announce(`t = ${t.toFixed(1)}; más probable ${state.neurons[top].name} con ${pct(P[top])}`);
+  announce(`t = ${t.toFixed(1)}; most likely ${state.neurons[top].name} with ${pct(P[top])}`);
 }
 
 
@@ -211,7 +211,7 @@ const trotterReps = (tau) => Math.max(1, Math.ceil(tau / 4.5));
 const dosQubits = (ops) => Object.entries(ops || {}).reduce((a, [k, v]) => a + (DOS_QUBITS.has(k.toLowerCase()) ? v : 0), 0);
 
 function cascadeLabel() {
-  if (!cascade.running) $("casc-btn").textContent = `Iniciar cascada desde ${state.source}`;
+  if (!cascade.running) $("casc-btn").textContent = `Start cascade from ${state.source}`;
 }
 
 function stopCascade() {
@@ -220,16 +220,16 @@ function stopCascade() {
 
 async function runCascade() {
   if (cascade.running) return;
-  if (!BACKEND || !state.backend) { toast("No hay backend: presiona Run en Qollab y elige uno.", true); return; }
+  if (!BACKEND || !state.backend) { toast("No backend: press Run on Qollab and pick one.", true); return; }
   const ionq = state.backend.ionq;
   if (ionq && state.jobsSent >= 1) {
-    toast("IonQ acepta un solo job por ejecución: presiona Stop y luego Run para enviar otro.", true);
+    toast("IonQ accepts one job per run: press Stop and then Run to send another one.", true);
     return;
   }
   if (state.backend.hardware && !cascade.armed) {
     cascade.armed = true;
-    $("casc-btn").textContent = "Confirmar: 1 paso en hardware (usa créditos)";
-    announce("Vuelve a presionar el botón para confirmar el envío al hardware.");
+    $("casc-btn").textContent = "Confirm: 1 step on hardware (uses credits)";
+    announce("Press the button again to confirm sending to hardware.");
     return;
   }
   cascade.armed = false;
@@ -248,12 +248,12 @@ async function runCascade() {
   const idx0 = state.index.get(centro);
   scene.setLabel(idx0, `⚡ ${centro}`);
   scene.fireLaser(idx0, Math.sin(theta / 2) ** 2);
-  if (ionq) toast("IonQ acepta un job por ejecución: se ejecutará solo el primer paso.");
+  if (ionq) toast("IonQ accepts one job per run: only the first step will run.");
   let fin = "completa";
   try {
     for (let k = 1; k <= total; k++) {
       if (cascade.stop) { fin = "detenida"; break; }
-      $("casc-estado").textContent = `Paso ${k} de ${total}: circuito de 10 qubits en ${state.backend.nombre}…`;
+      $("casc-estado").textContent = `Step ${k} of ${total}: 10-qubit circuit on ${state.backend.nombre}…`;
       await respirar();
       const params = { centro, theta: k === 1 ? theta : Math.PI, tau, gamma, pasos_trotter: trotterReps(tau) };
       const r = await py.paso(BACKEND, { ...params, shots });
@@ -272,7 +272,7 @@ async function runCascade() {
     }
   } catch (e) {
     fin = "error";
-    toast(`El paso falló: ${e.message}`, true);
+    toast(`The step failed: ${e.message}`, true);
   } finally {
     cascade.running = false;
     $("casc-stop").disabled = true;
@@ -282,10 +282,10 @@ async function runCascade() {
     cascadeLabel();
     if (bloqueado) $("run-btn").disabled = true;
     const n = cascade.steps.length, saltos = cascade.centers.length - 1;
-    const motivo = { completa: "", detenida: " (detenida)", error: " (error)",
-      vacio: ": la neurona no disparó (shot sin excitación)", perdida: ": no quedó ningún shot válido" }[fin];
-    const msg = `Cascada${motivo}. ${n} circuitos ejecutados, ${saltos} saltos: ${cascade.centers.join(" → ")}.`;
-    $("casc-estado").textContent = msg + (bloqueado ? " Para otro job en IonQ, presiona Stop y Run." : "");
+    const motivo = { completa: "", detenida: " (stopped)", error: " (error)",
+      vacio: ": the neuron did not fire (shot with no excitation)", perdida: ": no valid shot left" }[fin];
+    const msg = `Cascade${motivo}. ${n} circuits run, ${saltos} jumps: ${cascade.centers.join(" → ")}.`;
+    $("casc-estado").textContent = msg + (bloqueado ? " For another job on IonQ, press Stop and Run." : "");
     announce(msg);
   }
 }
@@ -305,43 +305,43 @@ function renderCascadeStep(r, k, total, salto) {
   }
   const twoq = dosQubits(r.ops_transpilado) || dosQubits(r.ops_escritas);
   $("casc-chips").innerHTML = [
-    `<span class="chip">paso <b>${k}/${total}</b></span>`,
+    `<span class="chip">step <b>${k}/${total}</b></span>`,
     `<span class="chip">qubits <b>${r.ventana.length}</b></span>`,
-    twoq ? `<span class="chip" title="Compuertas de dos qubits tras transpilar para el backend">2q <b>${twoq}</b></span>` : "",
-    `<span class="chip" title="Shots con como mucho una excitación (post-selección)">válidos <b>${pct(r.fraccion_valida)}</b></span>`,
-    r.fraccion_vacio > 0 ? `<span class="chip warn" title="Shots sin excitación: la neurona no disparó (cos²(θ/2) en el primer paso)">vacío <b>${pct(r.fraccion_vacio)}</b></span>` : "",
-    `<span class="chip warn" title="Cuánto se escaparía de la ventana en la red completa en este τ">fuga <b>${pct(r.fuga_red)}</b></span>`,
+    twoq ? `<span class="chip" title="Two-qubit gates after transpiling for the backend">2q <b>${twoq}</b></span>` : "",
+    `<span class="chip" title="Shots with at most one excitation (post-selection)">valid <b>${pct(r.fraccion_valida)}</b></span>`,
+    r.fraccion_vacio > 0 ? `<span class="chip warn" title="Shots with no excitation: the neuron did not fire (cos²(θ/2) on the first step)">empty <b>${pct(r.fraccion_vacio)}</b></span>` : "",
+    `<span class="chip warn" title="How much would leak out of the window on the full network at this τ">leak <b>${pct(r.fuga_red)}</b></span>`,
     `<span class="chip ${salto ? "good" : ""}">spike <b>${esc(r.spike ?? "—")}</b></span>`,
   ].join("");
   const series = [
-    { key: "exact", name: "Teoría en la ventana", values: r.teoria_ventana },
-    { key: "backend", name: `Medido (${r.backend})`, values: r.medida },
+    { key: "exact", name: "Theory in the window", values: r.teoria_ventana },
+    { key: "backend", name: `Measured (${r.backend})`, values: r.medida },
   ];
   groupedBars($("casc-bars"), r.ventana, series, { highlight: [0] });
   $("casc-legend").innerHTML = series.map((s) => `<span><i style="background:${SERIES_COLORS[s.key]}"></i>${esc(s.name)}</span>`).join("");
-  dataTable($("casc-table"), r.ventana, series, `Ventana centrada en ${r.centro}, paso ${k}`);
+  dataTable($("casc-table"), r.ventana, series, `Window centred on ${r.centro}, step ${k}`);
   const li = document.createElement("li");
   li.innerHTML = salto
-    ? `<b>${esc(r.centro)}</b> <span class="salto">→ ${esc(r.spike)}</span> · válidos ${pct(r.fraccion_valida)}`
+    ? `<b>${esc(r.centro)}</b> <span class="salto">→ ${esc(r.spike)}</span> · valid ${pct(r.fraccion_valida)}`
     : r.spike
-      ? `<b>${esc(r.centro)}</b> se queda (el spike salió en el centro)`
-      : `<b>${esc(r.centro)}</b> · sin spike`;
+      ? `<b>${esc(r.centro)}</b> stays (the spike came out on the centre)`
+      : `<b>${esc(r.centro)}</b> · no spike`;
   $("casc-log").appendChild(li);
   li.scrollIntoView({ block: "nearest" });
-  if (salto) announce(`Paso ${k}: dispara ${r.spike}.`);
+  if (salto) announce(`Step ${k}: ${r.spike} fires.`);
 }
 
 const CMP = [
-  { key: "coherente", name: "Coherente (sin medir)", color: "#38e1ff" },
-  { key: "medido", name: "Medido cada τ (red completa)", color: "#ffb347" },
-  { key: "ventanas", name: "Cascada de 10 qubits", color: "#a78bfa" },
-  { key: "clasico", name: "Caminata clásica", color: "#9aa4bf" },
+  { key: "coherente", name: "Coherent (unmeasured)", color: "#38e1ff" },
+  { key: "medido", name: "Measured every τ (full network)", color: "#ffb347" },
+  { key: "ventanas", name: "10-qubit cascade", color: "#a78bfa" },
+  { key: "clasico", name: "Classical walk", color: "#9aa4bf" },
 ];
 
 async function runComparison() {
   const btn = $("cmp-btn");
   btn.disabled = true;
-  btn.textContent = "Calculando…";
+  btn.textContent = "Computing…";
   await respirar();
   try {
     const tau = parseFloat($("tau").value);
@@ -350,20 +350,20 @@ async function runComparison() {
     const colors = CMP.map((s) => s.color), labels = CMP.map((s) => s.name);
     const dmax = Math.max(1, ...CMP.flatMap((s) => c.curvas[s.key].distancia));
     timeSeries($("cmp-dist"), c.tiempos, rows("distancia"), labels, { colors, ymax: Math.ceil(dmax * 2) / 2,
-      ariaLabel: "Distancia media al origen en sinapsis según el tiempo, para las cuatro dinámicas" });
+      ariaLabel: "Mean distance from the origin in synapses over time, for the four dynamics" });
     timeSeries($("cmp-orig"), c.tiempos, rows("origen"), labels, { colors,
-      ariaLabel: "Probabilidad de seguir en la neurona de origen según el tiempo, para las cuatro dinámicas" });
+      ariaLabel: "Probability of still being on the origin neuron over time, for the four dynamics" });
     $("cmp-legend").innerHTML = CMP.map((s) => `<span><i style="background:${s.color}"></i>${esc(s.name)}</span>`).join("");
     const filas = c.tiempos.map((t) => `t = ${t}`);
-    dataTable($("cmp-table"), filas, CMP.map((s) => ({ key: s.key, name: `${s.name}: distancia`, values: c.curvas[s.key].distancia })),
-      `Distancia media al origen desde ${state.source} con τ = ${tau}`);
-    $("cmp-table").querySelector("th").textContent = "Tiempo";
-    announce(`Comparación lista para τ = ${tau}.`);
+    dataTable($("cmp-table"), filas, CMP.map((s) => ({ key: s.key, name: `${s.name}: distance`, values: c.curvas[s.key].distancia })),
+      `Mean distance from ${state.source} with τ = ${tau}`);
+    $("cmp-table").querySelector("th").textContent = "Time";
+    announce(`Comparison ready for τ = ${tau}.`);
   } catch (e) {
-    toast(`Error en Python: ${e.message}`, true);
+    toast(`Python error: ${e.message}`, true);
   } finally {
     btn.disabled = false;
-    btn.textContent = "Calcular comparación";
+    btn.textContent = "Compute comparison";
   }
 }
 
@@ -381,7 +381,7 @@ async function compile() {
   const btn = $("compile-btn");
   const turno = (compile._turno = (compile._turno ?? 0) + 1); // sólo vale la última petición
   btn.disabled = true;
-  btn.textContent = "Calculando en Python…";
+  btn.textContent = "Computing in Python…";
   await respirar();
   try {
     const r = await py.simular(body);
@@ -389,14 +389,14 @@ async function compile() {
     state.micro = r;
     if (state.medido && state.medido.clave !== claveMicro(r)) state.medido = null;
     renderMicro();
-    announce(`Microcircuito de ${r.n_qubits} qubits listo: ${r.recursos.compuertas_2q} compuertas de dos qubits, ` +
-      `distancia a la teoría ${r.tvd_circuito.toFixed(3)}.`);
+    announce(`${r.n_qubits}-qubit microcircuit ready: ${r.recursos.compuertas_2q} two-qubit gates, ` +
+      `distance to theory ${r.tvd_circuito.toFixed(3)}.`);
   } catch (e) {
-    toast(`Error en Python: ${e.message}`, true);
+    toast(`Python error: ${e.message}`, true);
   } finally {
     if (turno === compile._turno) {
       btn.disabled = false;
-      btn.textContent = "Simular localmente (teoría · circuito · ruido)";
+      btn.textContent = "Simulate locally (theory · circuit · noise)";
     }
   }
 }
@@ -412,25 +412,25 @@ function renderMicro() {
   const fila = m ? m.resultados[m.resultados.length - 1] : null;
   $("chips").innerHTML = [
     `<span class="chip">qubits <b>${r.n_qubits}</b></span>`,
-    `<span class="chip" title="Cada salto RXX·RYY se compila a una compuerta ZZ en IonQ Forte">2q <b>${res.compuertas_2q}</b></span>`,
-    r.modo === "trotter" ? `<span class="chip">pasos <b>${r.pasos}</b></span>` : `<span class="chip">Givens <b>${r.saltos.length}</b></span>`,
-    `<span class="chip ${F > 0.75 ? "good" : "warn"}" title="Fidelidad estimada en IonQ Forte">F<sub>Forte</sub> <b>${F.toFixed(2)}</b></span>`,
-    `<span class="chip" title="Distancia de variación total entre circuito ideal y teoría exacta">TVD circuito <b>${r.tvd_circuito.toFixed(3)}</b></span>`,
-    r.ruido ? `<span class="chip" title="Fracción de disparos que respeta la simetría (≤ 1 excitación)">aceptados <b>${pct(r.ruido.fraccion_aceptada)}</b></span>` : "",
-    fila ? `<span class="chip good" title="TVD del backend tras post-selección">TVD backend <b>${fila.tvd_postseleccion.toFixed(3)}</b></span>` : "",
+    `<span class="chip" title="Each RXX·RYY hop compiles to ZZ gates on IonQ Forte">2q <b>${res.compuertas_2q}</b></span>`,
+    r.modo === "trotter" ? `<span class="chip">steps <b>${r.pasos}</b></span>` : `<span class="chip">Givens <b>${r.saltos.length}</b></span>`,
+    `<span class="chip ${F > 0.75 ? "good" : "warn"}" title="Estimated fidelity on IonQ Forte">F<sub>Forte</sub> <b>${F.toFixed(2)}</b></span>`,
+    `<span class="chip" title="Total variation distance between the ideal circuit and the exact theory">circuit TVD <b>${r.tvd_circuito.toFixed(3)}</b></span>`,
+    r.ruido ? `<span class="chip" title="Fraction of shots that respect the symmetry (≤ 1 excitation)">accepted <b>${pct(r.ruido.fraccion_aceptada)}</b></span>` : "",
+    fila ? `<span class="chip good" title="Backend TVD after post-selection">backend TVD <b>${fila.tvd_postseleccion.toFixed(3)}</b></span>` : "",
   ].join("");
 
   const labels = r.neuronas;
   const series = [
-    { key: "exact", name: "Teoría exacta", values: r.exacta },
-    { key: "ideal", name: "Circuito ideal", values: r.ideal },
+    { key: "exact", name: "Exact theory", values: r.exacta },
+    { key: "ideal", name: "Ideal circuit", values: r.ideal },
   ];
-  if (r.ruido) series.push({ key: "noisy", name: "Ruido tipo Forte (post-sel.)", values: r.ruido.marginales_postseleccion });
+  if (r.ruido) series.push({ key: "noisy", name: "Forte-like noise (post-sel.)", values: r.ruido.marginales_postseleccion });
   if (fila) series.push({ key: "backend", name: `${m.backend} (post-sel.)`, values: fila.marginales_postseleccion });
   const ymax = 1.1 * Math.max(r.escala_y ?? 0, 0.05, ...series.flatMap((s) => s.values));
   groupedBars($("bars"), labels, series, { highlight: [labels.indexOf(r.fuente)], max: ymax });
   $("bars-legend").innerHTML = series.map((s) => `<span><i style="background:${SERIES_COLORS[s.key]}"></i>${esc(s.name)}</span>`).join("");
-  dataTable($("bars-table"), labels, series, `Probabilidad de disparo por neurona en t = ${r.t}`);
+  dataTable($("bars-table"), labels, series, `Fire probability per neuron at t = ${r.t}`);
   const puntos = m ? m.resultados.map((f) => ({ t: f.t, values: f.marginales_postseleccion })) : null;
   timeSeries($("series"), r.serie.tiempos, r.serie.marginales, labels, { marker: r.t, points: puntos });
   if (r.qiskit_texto) {
@@ -438,7 +438,7 @@ function renderMicro() {
     const ops = Object.entries(r.qiskit_ops || {}).map(([k, v]) => `${k}:${v}`).join(" ");
     $("circ-count").textContent = `· ${ops}`;
   } else {
-    $("qiskit-text").textContent = "Qiskit no está disponible en este entorno.";
+    $("qiskit-text").textContent = "Qiskit is not available in this environment.";
   }
   scene.setHighlight(labels.map((nm) => state.index.get(nm)).filter((i) => i != null));
 }
@@ -448,9 +448,9 @@ function renderBackendInfo() {
   const b = state.backend;
   const pill = $("backend-pill");
   if (!b) {
-    pill.textContent = "sin backend";
+    pill.textContent = "no backend";
     pill.className = "pill err";
-    $("run-hint").textContent = "No hay backend: presiona Run en Qollab y elige uno.";
+    $("run-hint").textContent = "No backend: press Run on Qollab and pick one.";
     $("run-btn").disabled = true;
     $("casc-btn").disabled = true;
     return;
@@ -458,22 +458,22 @@ function renderBackendInfo() {
   pill.textContent = `backend: ${b.nombre}`;
   pill.className = `pill ${b.hardware ? "warn" : "ok"}`;
   $("run-hint").innerHTML = b.hardware
-    ? `<b>${esc(b.nombre)}</b> es hardware real de IonQ: el job usa créditos. Pruébalo antes en el simulador remoto de Forte (gratis).`
+    ? `<b>${esc(b.nombre)}</b> is real IonQ hardware: the job uses credits. Try it first on the Forte remote simulator (free).`
     : b.ionq
-      ? `<b>${esc(b.nombre)}</b>: simulador remoto de IonQ con su modelo de ruido (gratis). IonQ acepta <b>un job</b> por ejecución.`
-      : `<b>${esc(b.nombre)}</b>: simulador local (gratis, sin límite de jobs).`;
+      ? `<b>${esc(b.nombre)}</b>: IonQ remote simulator with its noise model (free). IonQ accepts <b>one job</b> per run.`
+      : `<b>${esc(b.nombre)}</b>: local simulator (free, no job limit).`;
 }
 
 async function runOnBackend() {
-  if (!BACKEND || !state.backend) { toast("No hay backend: presiona Run en Qollab y elige uno.", true); return; }
+  if (!BACKEND || !state.backend) { toast("No backend: press Run on Qollab and pick one.", true); return; }
   if (state.backend.ionq && state.jobsSent >= 1) {
-    toast("IonQ acepta un solo job por ejecución: presiona Stop y luego Run para enviar otro.", true);
+    toast("IonQ accepts one job per run: press Stop and then Run to send another one.", true);
     return;
   }
   if (state.backend.hardware && !state.armedHardware) {
     state.armedHardware = true;
-    $("run-btn").textContent = "Confirmar: enviar a hardware (usa créditos)";
-    announce("Vuelve a presionar el botón para confirmar el envío al hardware.");
+    $("run-btn").textContent = "Confirm: send to hardware (uses credits)";
+    announce("Press the button again to confirm sending to hardware.");
     return;
   }
   if (!state.micro) await compile();
@@ -484,8 +484,8 @@ async function runOnBackend() {
   const shots = Math.max(50, Math.min(5000, parseInt($("shots").value, 10) || 500));
   const btn = $("run-btn");
   btn.disabled = true;
-  btn.textContent = `Ejecutando ${tiempos.length} circuito${tiempos.length > 1 ? "s" : ""} en un job…`;
-  $("run-result").innerHTML = `<p class="result">Esperando resultados de <b>${esc(state.backend.nombre)}</b>…</p>`;
+  btn.textContent = `Running ${tiempos.length} circuit${tiempos.length > 1 ? "s" : ""} in one job…`;
+  $("run-result").innerHTML = `<p class="result">Waiting for results from <b>${esc(state.backend.nombre)}</b>…</p>`;
   await respirar();
   try {
     const m = await py.ejecutar(BACKEND, {
@@ -498,18 +498,18 @@ async function runOnBackend() {
     renderMicro();
     renderRunResult(m);
     const f = m.resultados[m.resultados.length - 1];
-    announce(`Resultados de ${m.backend}: distancia a la teoría ${f.tvd_postseleccion.toFixed(3)} tras post-selección, ` +
-      `${pct(f.fraccion_aceptada)} de disparos aceptados.`);
+    announce(`Results from ${m.backend}: distance to theory ${f.tvd_postseleccion.toFixed(3)} after post-selection, ` +
+      `${pct(f.fraccion_aceptada)} of shots accepted.`);
   } catch (e) {
-    $("run-result").innerHTML = `<p class="result">El job falló: ${esc(e.message)}</p>`;
-    toast(`El job falló: ${e.message}`, true);
+    $("run-result").innerHTML = `<p class="result">The job failed: ${esc(e.message)}</p>`;
+    toast(`The job failed: ${e.message}`, true);
   } finally {
     state.armedHardware = false;
-    btn.textContent = "Ejecutar circuito";
+    btn.textContent = "Run circuit";
     btn.disabled = state.backend.ionq && state.jobsSent >= 1;
     if (btn.disabled) {
       $("casc-btn").disabled = true; // IonQ: un job por ejecución, también para la cascada
-      $("run-hint").innerHTML += " <b>Job enviado.</b> Para otro, presiona Stop y Run.";
+      $("run-hint").innerHTML += " <b>Job sent.</b> For another one, press Stop and Run.";
     }
   }
 }
@@ -517,15 +517,15 @@ async function runOnBackend() {
 function renderRunResult(m) {
   const ops = (o) => Object.entries(o || {}).map(([k, v]) => `${k}:${v}`).join(" ") || "—";
   $("run-result").innerHTML =
-    `<div class="result"><p><b>${esc(m.backend)}</b> · ${m.shots} disparos por circuito · ${m.modo}` +
-    (m.modo === "trotter" ? ` · ${m.pasos} pasos` : "") + (m.job_id ? `<br>job <code>${esc(m.job_id)}</code>` : "") + `</p>` +
-    `<div class="data-box"><table><caption class="sr-only">Comparación con la teoría por tiempo</caption>` +
-    `<thead><tr><th scope="col">t</th><th scope="col">TVD bruto</th><th scope="col">TVD post-sel.</th><th scope="col">aceptados</th></tr></thead><tbody>` +
+    `<div class="result"><p><b>${esc(m.backend)}</b> · ${m.shots} shots per circuit · ${m.modo}` +
+    (m.modo === "trotter" ? ` · ${m.pasos} steps` : "") + (m.job_id ? `<br>job <code>${esc(m.job_id)}</code>` : "") + `</p>` +
+    `<div class="data-box"><table><caption class="sr-only">Comparison with theory per time</caption>` +
+    `<thead><tr><th scope="col">t</th><th scope="col">raw TVD</th><th scope="col">post-sel. TVD</th><th scope="col">accepted</th></tr></thead><tbody>` +
     m.resultados.map((f) => `<tr><th scope="row">${f.t}</th><td>${f.tvd_bruto.toFixed(3)}</td>` +
       `<td>${f.tvd_postseleccion.toFixed(3)}</td><td>${pct(f.fraccion_aceptada)}</td></tr>`).join("") +
     `</tbody></table></div>` +
-    `<p class="hint">Compuertas escritas: <code>${esc(ops(m.ops_escritas))}</code><br>` +
-    `Tras transpilar para el backend: <code>${esc(ops(m.ops_transpilado))}</code></p></div>`;
+    `<p class="hint">Gates as written: <code>${esc(ops(m.ops_escritas))}</code><br>` +
+    `After transpiling for the backend: <code>${esc(ops(m.ops_transpilado))}</code></p></div>`;
 }
 
 // ------------------------------------------------------------------ figuras de Qiskit (mpl)
@@ -561,8 +561,8 @@ async function dibujarFiguras() {
   const clave = JSON.stringify(p);
   const turno = ++fig.turno;
   $("fig-estado").textContent = p.vista === "expandida"
-    ? "Dibujando con Qiskit… la vista expandida tiene cientos de compuertas y tarda unos segundos."
-    : "Dibujando con Qiskit…";
+    ? "Drawing with Qiskit… the expanded view has hundreds of gates and takes a few seconds."
+    : "Drawing with Qiskit…";
   await respirar();
   try {
     let f = fig.cache.get(clave);
@@ -572,19 +572,19 @@ async function dibujarFiguras() {
     const medido = f.histograma_tipo === "medido";
     $("fig-title").textContent = f.titulo;
     $("fig-circ").src = f.circuito_svg;
-    $("fig-circ").alt = `Circuito de Qiskit de ${f.neuronas.length} qubits (${f.neuronas.join(", ")}). ` +
-      `Compuertas: ${ops}. Profundidad ${f.profundidad}.`;
-    $("fig-circ-cap").textContent = `QuantumCircuit.draw("mpl") · ${ops} · profundidad ${f.profundidad}`;
+    $("fig-circ").alt = `${f.neuronas.length}-qubit Qiskit circuit (${f.neuronas.join(", ")}). ` +
+      `Gates: ${ops}. Depth ${f.profundidad}.`;
+    $("fig-circ-cap").textContent = `QuantumCircuit.draw("mpl") · ${ops} · depth ${f.profundidad}`;
     $("fig-hist").src = f.histograma_svg;
     $("fig-hist").alt = medido
-      ? "Histograma de los conteos medidos en el backend, agrupados por la neurona que disparó."
-      : "Distribución ideal del circuito según el Statevector de Qiskit, agrupada por neurona excitada.";
+      ? "Histogram of the counts measured on the backend, grouped by the neuron that fired."
+      : "Ideal distribution of the circuit from the Qiskit Statevector, grouped by excited neuron.";
     $("fig-hist-cap").textContent = medido
-      ? "plot_histogram con los conteos que devolvió el backend · ∅ = ninguna neurona disparó."
-      : "plot_distribution del Statevector ideal · todavía no se ejecuta en un backend.";
+      ? "plot_histogram of the counts returned by the backend · ∅ = no neuron fired."
+      : "plot_distribution of the ideal Statevector · not run on a backend yet.";
     $("fig-estado").textContent = "";
   } catch (e) {
-    if (turno === fig.turno) $("fig-estado").textContent = `No se pudo dibujar: ${e.message}`;
+    if (turno === fig.turno) $("fig-estado").textContent = `Could not draw: ${e.message}`;
   }
 }
 
@@ -603,7 +603,7 @@ function bindUI() {
     const th = parseFloat($("theta").value);
     $("theta-val").textContent = fmtTheta(th);
     $("pfire").textContent = (Math.sin(th / 2) ** 2).toFixed(2);
-    $("theta").setAttribute("aria-valuetext", `θ = ${fmtTheta(th)}, probabilidad de disparo ${(Math.sin(th / 2) ** 2).toFixed(2)}`);
+    $("theta").setAttribute("aria-valuetext", `θ = ${fmtTheta(th)}, fire probability ${(Math.sin(th / 2) ** 2).toFixed(2)}`);
   });
   $("gamma").addEventListener("input", () => { $("gamma-val").textContent = parseFloat($("gamma").value).toFixed(1); });
   $("tmax").addEventListener("input", () => { $("tmax-val").textContent = $("tmax").value; });
@@ -628,7 +628,7 @@ function bindUI() {
   $("quality").addEventListener("change", () => scene.setQuality($("quality").value));
   scene.on("quality", (q, auto) => {
     $("quality").querySelector('option[value="auto"]').textContent = `Auto (${QUALITY[q].label.toLowerCase()})`;
-    if (auto) toast(`Calidad gráfica ajustada a "${QUALITY[q].label}" para mantener la fluidez`);
+    if (auto) toast(`Graphics quality set to "${QUALITY[q].label}" to keep it smooth`);
   });
   $("autorotate").addEventListener("change", () => scene.setAutoRotate($("autorotate").checked));
   $("toplist").addEventListener("click", (e) => {
@@ -668,9 +668,9 @@ function bindUI() {
     if (i < 0 || !px) { tip.classList.remove("show"); return; }
     const d = state.neurons[i];
     let p = "";
-    if (state.walk) p = `<br>P(disparo) = <b>${(100 * frameValues(state.frame).P[i]).toFixed(2)}%</b>`;
-    tip.innerHTML = `<b>${d.name}</b> <span class="tag ${d.type}">${TYPE_ES[d.type]}</span><br>${d.degree} conexiones${p}` +
-      `<br><span style="color:var(--faint)">clic: disparar láser aquí</span>`;
+    if (state.walk) p = `<br>P(fire) = <b>${(100 * frameValues(state.frame).P[i]).toFixed(2)}%</b>`;
+    tip.innerHTML = `<b>${d.name}</b> <span class="tag ${d.type}">${TYPE_ES[d.type]}</span><br>${d.degree} connections${p}` +
+      `<br><span style="color:var(--faint)">click: fire the laser here</span>`;
     tip.style.left = `${px[0] + 14}px`;
     tip.style.top = `${px[1] + 14}px`;
     tip.classList.add("show");
@@ -683,21 +683,21 @@ async function init() {
   requestAnimationFrame(loop);
   const loaderText = $("loader-text");
   try {
-    loaderText.textContent = "Leyendo el conectoma de Cook et al. (2019) en Python…";
+    loaderText.textContent = "Reading the Cook et al. (2019) connectome in Python…";
     await respirar();
     const con = await py.conectoma();
     state.neurons = con.neurons;
     con.neurons.forEach((d, i) => state.index.set(d.name, i));
     $("neuron-list").innerHTML = con.neurons.map((d) => `<option value="${d.name}">${TYPE_ES[d.type]}</option>`).join("");
-    loaderText.textContent = "Cargando el cuerpo 3D…";
+    loaderText.textContent = "Loading the 3D body…";
     let glb = null;
-    try { glb = await py.cuerpo(); } catch (e) { console.log(`Sin cuerpo .glb: ${e.message}`); }
+    try { glb = await py.cuerpo(); } catch (e) { console.log(`No .glb body: ${e.message}`); }
     scene.setData(con.neurons, con.edges, glb);
 
     const { microcircuitos } = await py.microcircuitos();
     state.presets = microcircuitos;
     $("preset").innerHTML = microcircuitos.map((m) =>
-      `<option value="${m.id}">${esc(m.nombre)}${m.hardware ? " · recomendado para hardware" : ""}</option>`).join("");
+      `<option value="${m.id}">${esc(m.nombre)}${m.hardware ? " · recommended for hardware" : ""}</option>`).join("");
     $("preset-desc").textContent = selectedPreset()?.descripcion ?? "";
 
     if (BACKEND) {
@@ -706,15 +706,15 @@ async function init() {
     renderBackendInfo();
     $("loader").classList.add("hide");
     neuronCard(state.source);
-    console.log(`Cerebro Cuántico Optogenético listo · ${con.neurons.length} neuronas · ${con.edges.length} sinapsis dibujadas` +
+    console.log(`Optogenetic Quantum Brain ready · ${con.neurons.length} neurons · ${con.edges.length} synapses drawn` +
       (state.backend ? ` · backend ${state.backend.nombre}` : ""));
     await fire("AVM");
     await compile();
   } catch (e) {
-    loaderText.textContent = `No se pudo iniciar el núcleo Python (${e.message}).`;
+    loaderText.textContent = `Could not start the Python core (${e.message}).`;
     $("backend-pill").textContent = "error";
     $("backend-pill").className = "pill err";
-    console.log(`Error al iniciar: ${e.stack || e.message}`);
+    console.log(`Startup error: ${e.stack || e.message}`);
   }
 }
 

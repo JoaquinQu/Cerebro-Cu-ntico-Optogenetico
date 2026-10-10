@@ -56,9 +56,9 @@ const S_TR = 0.028; // ejes transversales (×1.4 respecto del real, para leer me
 const GLTF_SCALE = 0.01; // 1 unidad glTF = 100 µm  (ver docs/MODELO_3D.md)
 
 export const QUALITY = {
-  alta: { label: "Alta", pixelRatio: () => Math.min(window.devicePixelRatio, 1.75), bloom: true, bloomScale: 1 },
-  media: { label: "Media", pixelRatio: () => 1, bloom: true, bloomScale: 0.5 },
-  baja: { label: "Baja", pixelRatio: () => Math.min(window.devicePixelRatio, 1) * 0.85, bloom: false, bloomScale: 0 },
+  alta: { label: "High", pixelRatio: () => Math.min(window.devicePixelRatio, 1.75), bloom: true, bloomScale: 1 },
+  media: { label: "Medium", pixelRatio: () => 1, bloom: true, bloomScale: 0.5 },
+  baja: { label: "Low", pixelRatio: () => Math.min(window.devicePixelRatio, 1) * 0.85, bloom: false, bloomScale: 0 },
 };
 
 export class WormScene {
@@ -204,7 +204,7 @@ export class WormScene {
   async _loadBody() {
     // 1) Modelo anatómico (data/gusano.glb, que Python lee y entrega como bytes)
     try {
-      if (!this.glbBytes) throw new Error("sin modelo .glb");
+      if (!this.glbBytes) throw new Error("no .glb model");
       const gltf = await new GLTFLoader().parseAsync(this.glbBytes, "");
       const group = new THREE.Group();
       gltf.scene.updateMatrixWorld(true);
@@ -226,13 +226,13 @@ export class WormScene {
           ? this._bodyMaterial("#4fb3ff", "#bff3ff", 0.75)
           : this._bodyMaterial("#2a6dff", "#7fe8ff", 1.0)));
       });
-      if (!group.children.length) throw new Error("glb vacío");
+      if (!group.children.length) throw new Error("empty glb");
       this.body = group;
       this.scene.add(group);
       this.bodySource = "glb";
     } catch (err) {
       // 2) Respaldo: cuerpo aproximado generado aquí mismo
-      console.info("Usando cuerpo procedural:", err?.message ?? err);
+      console.info("Using procedural body:", err?.message ?? err);
       this._buildProceduralBody();
       this.bodySource = "procedural";
     }

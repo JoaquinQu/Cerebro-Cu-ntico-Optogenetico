@@ -1,174 +1,174 @@
-<a class="skip-link" href="#panel-laser">Saltar a los controles</a>
+<a class="skip-link" href="#panel-laser">Skip to controls</a>
 
-<div class="app" id="app">
+<div class="app" id="app" lang="en">
   <header class="topbar">
     <div class="brand">
       <span class="brand-dot" aria-hidden="true"></span>
       <div>
-        <h1>Cerebro Cuántico Optogenético</h1>
-        <p>Quantum walk sobre el conectoma real de <em>C. elegans</em> · 302 neuronas · Qiskit</p>
+        <h1>Optogenetic Quantum Brain</h1>
+        <p>Quantum walk on the real <em>C. elegans</em> connectome · 302 neurons · Qiskit</p>
       </div>
     </div>
-    <p class="pill" id="backend-pill" role="status">cargando…</p>
+    <p class="pill" id="backend-pill" role="status">loading…</p>
   </header>
 
   <div class="layout">
-    <!-- 1 · Láser y red completa (física exacta, sin backend) -->
+    <!-- 1 · Laser and full network (exact physics, no backend) -->
     <section class="panel left" id="panel-laser" aria-labelledby="h-laser" tabindex="-1">
       <div class="card">
-        <h2 id="h-laser"><span class="step" aria-hidden="true">1</span> Láser optogenético</h2>
+        <h2 id="h-laser"><span class="step" aria-hidden="true">1</span> Optogenetic laser</h2>
         <div class="field">
-          <label for="neuron-input">Neurona iluminada</label>
+          <label for="neuron-input">Illuminated neuron</label>
           <input id="neuron-input" list="neuron-list" value="AVM" autocomplete="off" spellcheck="false"
                  aria-describedby="neuron-hint neuron-card" />
           <datalist id="neuron-list"></datalist>
-          <small class="hint" id="neuron-hint">Escribe un nombre (p. ej. AVM, ASHL) o haz clic en una neurona del gusano.</small>
+          <small class="hint" id="neuron-hint">Type a name (e.g. AVM, ASHL) or click a neuron on the worm.</small>
         </div>
         <p class="neuron-card" id="neuron-card" aria-live="polite"></p>
 
         <div class="field">
-          <label for="theta">Intensidad del pulso · θ = Ω·τ <b id="theta-val">π</b></label>
+          <label for="theta">Pulse strength · θ = Ω·τ <b id="theta-val">π</b></label>
           <input type="range" id="theta" min="0" max="3.14159" step="0.01" value="3.14159" aria-describedby="pfire-hint" />
-          <small class="hint" id="pfire-hint">P(disparo) = sin²(θ/2) = <b id="pfire">1.00</b></small>
+          <small class="hint" id="pfire-hint">P(fire) = sin²(θ/2) = <b id="pfire">1.00</b></small>
         </div>
         <div class="field">
-          <label for="gamma">Acoplamiento γ <b id="gamma-val">1.0</b></label>
+          <label for="gamma">Coupling γ <b id="gamma-val">1.0</b></label>
           <input type="range" id="gamma" min="0.2" max="3" step="0.1" value="1" />
         </div>
         <div class="field">
-          <label for="tmax">Duración de la simulación <b id="tmax-val">60</b></label>
+          <label for="tmax">Simulation length <b id="tmax-val">60</b></label>
           <input type="range" id="tmax" min="10" max="200" step="5" value="60" />
         </div>
         <button type="button" class="btn primary" id="fire-btn">
           <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 2v6M12 16v6M2 12h6M16 12h6" /><circle cx="12" cy="12" r="3" /></svg>
-          Disparar láser
+          Fire laser
         </button>
       </div>
 
       <div class="card playback">
-        <h3 id="h-play">Propagación · teoría exacta</h3>
-        <p class="hint">El gusano completo se calcula de forma exacta y clásica: con un láser, los 302 qubits se reducen a una matriz de 302 × 302. La parte en qubits está en el panel 2.</p>
+        <h3 id="h-play">Propagation · exact theory</h3>
+        <p class="hint">The whole worm is computed exactly on a classical computer: with one laser, the 302 qubits reduce to a 302 × 302 matrix. The part that runs on qubits is panel 2.</p>
         <div class="row">
-          <button type="button" class="icon-btn" id="play-btn" aria-label="Reproducir" aria-pressed="false">
+          <button type="button" class="icon-btn" id="play-btn" aria-label="Play" aria-pressed="false">
             <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" id="play-icon"><path d="M7 5l12 7-12 7z" /></svg>
           </button>
-          <label class="sr-only" for="timeline">Tiempo de la animación</label>
+          <label class="sr-only" for="timeline">Animation time</label>
           <input type="range" id="timeline" min="0" max="1000" value="0" />
           <output class="mono" id="time-label" for="timeline">t = 0.0</output>
         </div>
         <div class="row small">
-          <label class="toggle" title="Relativa: la neurona más probable brilla con intensidad P(disparo). Absoluta: brillo = √P."><input type="checkbox" id="relative" checked /> escala relativa</label>
-          <label class="toggle"><input type="checkbox" id="show-edges" checked /> sinapsis</label>
-          <label class="toggle">velocidad
+          <label class="toggle" title="Relative: the most likely neuron glows with intensity P(fire). Absolute: brightness = √P."><input type="checkbox" id="relative" checked /> relative scale</label>
+          <label class="toggle"><input type="checkbox" id="show-edges" checked /> synapses</label>
+          <label class="toggle">speed
             <select id="speed"><option value="0.5">0.5×</option><option value="1" selected>1×</option><option value="2">2×</option></select>
           </label>
-          <label class="toggle"><input type="checkbox" id="autorotate" /> rotar</label>
-          <label class="toggle">calidad
+          <label class="toggle"><input type="checkbox" id="autorotate" /> rotate</label>
+          <label class="toggle">quality
             <select id="quality">
-              <option value="auto">Auto</option><option value="alta">Alta</option><option value="media">Media</option><option value="baja">Baja</option>
+              <option value="auto">Auto</option><option value="alta">High</option><option value="media">Medium</option><option value="baja">Low</option>
             </select>
           </label>
         </div>
         <dl class="metrics">
-          <div><dt>Neuronas activas</dt><dd id="m-active">—</dd></div>
-          <div><dt>Participación</dt><dd id="m-part">—</dd></div>
-          <div><dt>Más probable</dt><dd id="m-top">—</dd></div>
+          <div><dt>Active neurons</dt><dd id="m-active">—</dd></div>
+          <div><dt>Participation</dt><dd id="m-part">—</dd></div>
+          <div><dt>Most likely</dt><dd id="m-top">—</dd></div>
         </dl>
-        <h4 class="sub" id="h-top">Neuronas más probables</h4>
+        <h4 class="sub" id="h-top">Most likely neurons</h4>
         <ol class="toplist" id="toplist" aria-labelledby="h-top"></ol>
       </div>
     </section>
 
-    <!-- Escena 3D -->
+    <!-- 3D scene -->
     <div class="stage" id="stage">
       <canvas id="scene" tabindex="0" role="img"
-              aria-label="Gusano C. elegans en 3D con sus 302 neuronas."
+              aria-label="3D C. elegans worm with its 302 neurons."
               aria-describedby="scene-help"></canvas>
       <p class="scene-help" id="scene-help">
-        Arrastra para girar · rueda para acercar · clic en una neurona para iluminarla.
-        Con el foco aquí: <kbd>Espacio</kbd> reproduce/pausa, <kbd>←</kbd>/<kbd>→</kbd> avanzan el tiempo, <kbd>R</kbd> centra la vista.
+        Drag to rotate · scroll to zoom · click a neuron to illuminate it.
+        With focus here: <kbd>Space</kbd> play/pause, <kbd>←</kbd>/<kbd>→</kbd> step in time, <kbd>R</kbd> reset view.
       </p>
-      <div class="formula" aria-label="P sub k de t igual a seno cuadrado de theta medios por el módulo al cuadrado de la amplitud de k en e a la menos i gamma J t aplicado a j">
+      <div class="formula" aria-label="P sub k of t equals sine squared of theta over two times the squared magnitude of the amplitude of k in e to the minus i gamma J t applied to j">
         P<sub>k</sub>(t) = sin²(θ/2) · |⟨k| e<sup>−iγJt</sup> |j⟩|²
       </div>
       <div class="legend" aria-hidden="true">
-        <span><i class="dot sensory"></i>sensorial</span>
-        <span><i class="dot inter"></i>interneurona</span>
-        <span><i class="dot motor"></i>motora</span>
-        <span class="grad"><i></i>probabilidad</span>
+        <span><i class="dot sensory"></i>sensory</span>
+        <span><i class="dot inter"></i>interneuron</span>
+        <span><i class="dot motor"></i>motor</span>
+        <span class="grad"><i></i>probability</span>
       </div>
       <div class="tooltip" id="tooltip" aria-hidden="true"></div>
-      <div class="loader" id="loader" role="status"><div class="ring" aria-hidden="true"></div><p id="loader-text">Cargando el conectoma…</p></div>
+      <div class="loader" id="loader" role="status"><div class="ring" aria-hidden="true"></div><p id="loader-text">Loading the connectome…</p></div>
     </div>
 
-    <!-- 2 · Cascada cuántica: cada paso es un circuito de Qiskit -->
+    <!-- 2 · Quantum cascade: every step is a Qiskit circuit -->
     <section class="panel right" id="panel-q" aria-labelledby="h-casc">
       <div class="card cascade">
-        <h2 id="h-casc"><span class="step" aria-hidden="true">2</span> Cascada cuántica de spikes</h2>
-        <p class="desc">Cada paso es un <b>circuito de Qiskit de 10 qubits</b>: la neurona que disparó y sus 9 vecinas con más sinapsis.
-          Se ejecuta en el backend elegido, se mide, y la neurona que sale en 1 dispara el paso siguiente.</p>
+        <h2 id="h-casc"><span class="step" aria-hidden="true">2</span> Quantum spike cascade</h2>
+        <p class="desc">Each step is a <b>10-qubit Qiskit circuit</b>: the neuron that fired and its 9 neighbours with the most synapses.
+          It runs on the selected backend and is measured; the neuron that comes out as 1 triggers the next step.</p>
         <div class="field">
-          <label for="tau">Tiempo por paso τ <b id="tau-val">8</b></label>
+          <label for="tau">Time per step τ <b id="tau-val">8</b></label>
           <input type="range" id="tau" min="2" max="12" step="1" value="8" aria-describedby="tau-hint" />
-          <small class="hint" id="tau-hint">τ chico: la ventana representa mejor la red, pero medir tan seguido congela el walk (efecto Zeno).
-            τ grande: la excitación se mueve más, pero se escapa de la ventana.</small>
+          <small class="hint" id="tau-hint">Small τ: the window represents the network better, but measuring that often freezes the walk (Zeno effect).
+            Large τ: the excitation moves further, but leaks out of the window.</small>
         </div>
         <div class="row">
-          <label class="toggle" for="casc-pasos">pasos</label>
+          <label class="toggle" for="casc-pasos">steps</label>
           <input type="number" id="casc-pasos" value="20" min="1" max="60" step="1" />
           <label class="toggle" for="casc-shots">shots</label>
           <input type="number" id="casc-shots" value="200" min="20" max="2000" step="20" />
         </div>
         <div class="row">
-          <button type="button" class="btn primary" id="casc-btn">Iniciar cascada desde AVM</button>
-          <button type="button" class="btn ghost" id="casc-stop" disabled>Detener</button>
+          <button type="button" class="btn primary" id="casc-btn">Start cascade from AVM</button>
+          <button type="button" class="btn ghost" id="casc-stop" disabled>Stop</button>
         </div>
-        <p class="hint" id="casc-estado" aria-live="polite">La cascada parte de la neurona iluminada en el panel 1.</p>
+        <p class="hint" id="casc-estado" aria-live="polite">The cascade starts from the neuron illuminated in panel 1.</p>
         <div class="chips" id="casc-chips"></div>
         <figure class="chart">
           <div id="casc-bars"></div>
           <figcaption class="legend-row" id="casc-legend"></figcaption>
         </figure>
         <details class="data-box">
-          <summary>Ver la ventana como tabla</summary>
+          <summary>Show the window as a table</summary>
           <div id="casc-table"></div>
         </details>
         <details class="data-box" open>
-          <summary>Cadena de spikes</summary>
+          <summary>Spike chain</summary>
           <ol class="casc-log" id="casc-log"></ol>
         </details>
-        <button type="button" class="btn" id="casc-fig-btn" disabled>Ver circuitos de la cascada en Qiskit (mpl)</button>
+        <button type="button" class="btn" id="casc-fig-btn" disabled>Show the cascade circuits in Qiskit (mpl)</button>
         <details class="data-box" id="cmp-box">
-          <summary>¿Qué cambia al medir? Coherente · medido · clásico</summary>
-          <p class="hint">Mismo láser y mismo τ. El walk <b>coherente</b> no se mide; el <b>medido</b> se mide cada τ en la red completa;
-            la <b>cascada</b> es lo que hacen estos circuitos de 10 qubits; la <b>clásica</b> es una caminata aleatoria común.
-            Al medir se pierde la interferencia entre pasos y, con τ chico, el walk se congela.</p>
-          <button type="button" class="btn" id="cmp-btn">Calcular comparación</button>
-          <figure class="chart small"><div id="cmp-dist"></div><figcaption class="hint">Distancia media al origen, en sinapsis.</figcaption></figure>
-          <figure class="chart small"><div id="cmp-orig"></div><figcaption class="hint">Probabilidad de seguir en la neurona de origen.</figcaption></figure>
+          <summary>What changes when you measure? Coherent · measured · classical</summary>
+          <p class="hint">Same laser and same τ. The <b>coherent</b> walk is never measured; the <b>measured</b> one is measured every τ on the full network;
+            the <b>cascade</b> is what these 10-qubit circuits do; the <b>classical</b> one is an ordinary random walk.
+            Measuring destroys the interference between steps and, with small τ, freezes the walk.</p>
+          <button type="button" class="btn" id="cmp-btn">Compute comparison</button>
+          <figure class="chart small"><div id="cmp-dist"></div><figcaption class="hint">Mean distance from the origin, in synapses.</figcaption></figure>
+          <figure class="chart small"><div id="cmp-orig"></div><figcaption class="hint">Probability of still being on the origin neuron.</figcaption></figure>
           <div class="legend-row" id="cmp-legend"></div>
-          <details class="data-box"><summary>Ver como tabla</summary><div id="cmp-table"></div></details>
+          <details class="data-box"><summary>Show as a table</summary><div id="cmp-table"></div></details>
         </details>
       </div>
 
-      <!-- 3 · Microcircuito fijo en qubits -->
+      <!-- 3 · Fixed microcircuit on qubits -->
       <div class="card">
-        <h2 id="h-micro"><span class="step" aria-hidden="true">3</span> Microcircuito en qubits</h2>
+        <h2 id="h-micro"><span class="step" aria-hidden="true">3</span> Microcircuit on qubits</h2>
         <div class="field">
-          <label for="preset">Circuito</label>
+          <label for="preset">Circuit</label>
           <select id="preset" aria-describedby="preset-desc"></select>
         </div>
         <p class="desc" id="preset-desc"></p>
         <fieldset class="seg">
-          <legend class="sr-only">Construcción del circuito</legend>
+          <legend class="sr-only">Circuit construction</legend>
           <label><input type="radio" name="modo" value="trotter" checked /><span>Trotter</span></label>
           <label><input type="radio" name="modo" value="givens" /><span>Givens</span></label>
         </fieldset>
         <div class="field">
-          <label for="tmicro">Tiempo de evolución t <b id="tmicro-val">30</b></label>
+          <label for="tmicro">Evolution time t <b id="tmicro-val">30</b></label>
           <input type="range" id="tmicro" min="1" max="80" step="1" value="30" />
         </div>
-        <button type="button" class="btn" id="compile-btn">Simular localmente (teoría · circuito · ruido)</button>
+        <button type="button" class="btn" id="compile-btn">Simulate locally (theory · circuit · noise)</button>
 
         <div class="chips" id="chips" aria-live="polite"></div>
         <figure class="chart">
@@ -176,53 +176,53 @@
           <figcaption class="legend-row" id="bars-legend"></figcaption>
         </figure>
         <details class="data-box">
-          <summary>Ver datos como tabla</summary>
+          <summary>Show data as a table</summary>
           <div id="bars-table"></div>
         </details>
         <figure class="chart small">
           <div id="series"></div>
-          <figcaption class="hint">Teoría exacta de cada neurona en el tiempo (línea amarilla: t elegido; puntos: medidos en el backend).</figcaption>
+          <figcaption class="hint">Exact theory for each neuron over time (yellow line: selected t; dots: measured on the backend).</figcaption>
         </figure>
         <details class="data-box">
-          <summary>Circuito Qiskit <span class="mono" id="circ-count"></span></summary>
-          <pre class="qiskit-text" id="qiskit-text" tabindex="0" aria-label="Dibujo en texto del circuito Qiskit"></pre>
+          <summary>Qiskit circuit <span class="mono" id="circ-count"></span></summary>
+          <pre class="qiskit-text" id="qiskit-text" tabindex="0" aria-label="Text drawing of the Qiskit circuit"></pre>
         </details>
-        <button type="button" class="btn" id="micro-fig-btn">Ver circuito en Qiskit (mpl)</button>
+        <button type="button" class="btn" id="micro-fig-btn">Show circuit in Qiskit (mpl)</button>
       </div>
 
       <div class="card run">
-        <h3 id="h-run">Ejecutar en el backend elegido</h3>
-        <p class="hint" id="run-hint">El backend es el que elegiste al presionar <b>Run</b> en Qollab.</p>
+        <h3 id="h-run">Run on the selected backend</h3>
+        <p class="hint" id="run-hint">The backend is the one you picked when pressing <b>Run</b> on Qollab.</p>
         <div class="row">
-          <label class="toggle" for="shots">disparos</label>
+          <label class="toggle" for="shots">shots</label>
           <input type="number" id="shots" value="500" min="50" max="5000" step="50" />
         </div>
-        <label class="toggle block"><input type="checkbox" id="sweep" checked /> barrido de 4 tiempos en un solo job</label>
-        <button type="button" class="btn primary" id="run-btn">Ejecutar circuito</button>
+        <label class="toggle block"><input type="checkbox" id="sweep" checked /> sweep 4 times in a single job</label>
+        <button type="button" class="btn primary" id="run-btn">Run circuit</button>
         <div id="run-result" aria-live="polite"></div>
       </div>
     </section>
   </div>
 
   <footer class="footer">
-    <span>Datos: Cook et al. 2019 · OpenWorm · ejes transversales ×1.4</span>
+    <span>Data: Cook et al. 2019 · OpenWorm · transverse axes ×1.4</span>
     <span class="attribution">This effort is supported by Qollab &amp; IonQ.</span>
   </footer>
 
   <dialog class="fig-dialog" id="fig-dialog" aria-labelledby="fig-title">
     <header class="fig-head">
-      <h2 id="fig-title">Circuito en Qiskit</h2>
-      <button type="button" class="icon-btn" id="fig-close" aria-label="Cerrar">
+      <h2 id="fig-title">Circuit in Qiskit</h2>
+      <button type="button" class="icon-btn" id="fig-close" aria-label="Close">
         <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 6l12 12M18 6L6 18" /></svg>
       </button>
     </header>
     <div class="fig-controls" id="fig-controls">
-      <label class="toggle" for="fig-step">paso</label>
+      <label class="toggle" for="fig-step">step</label>
       <select id="fig-step"></select>
       <fieldset class="seg" id="fig-vista">
-        <legend class="sr-only">Vista del circuito</legend>
-        <label><input type="radio" name="fig-vista" value="compacta" checked /><span>Compacta (e<sup>−iτH</sup>)</span></label>
-        <label><input type="radio" name="fig-vista" value="expandida" /><span>Expandida (Trotter)</span></label>
+        <legend class="sr-only">Circuit view</legend>
+        <label><input type="radio" name="fig-vista" value="compacta" checked /><span>Compact (e<sup>−iτH</sup>)</span></label>
+        <label><input type="radio" name="fig-vista" value="expandida" /><span>Expanded (Trotter)</span></label>
       </fieldset>
     </div>
     <p class="hint" id="fig-estado" aria-live="polite"></p>

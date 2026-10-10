@@ -69,7 +69,7 @@ class _Trabajo:
 class BackendSimulado:
     """Backend ideal: muestrea la distribución exacta del circuito (claves con q0 a la derecha)."""
 
-    name = "simulador_local_de_desarrollo"
+    name = "local_dev_simulator"
 
     def __init__(self, semilla=3):
         self.rng = np.random.default_rng(semilla)

@@ -81,7 +81,7 @@ def main():
         pag.goto(a.url + "/?backend=qpu")
         pag.wait_for_function("document.querySelector('#chips').children.length > 0", timeout=60000)
         pag.click("#run-btn")
-        assert "Confirmar" in pag.inner_text("#run-btn"), "falta la confirmación de hardware"
+        assert "Confirm" in pag.inner_text("#run-btn"), "falta la confirmación de hardware"
         print("qpu: pide confirmación ✓")
 
         # 5) teclado y pantalla angosta

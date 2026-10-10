@@ -45,7 +45,7 @@ def indice(nombre: str) -> int:
     _, nombres, _ = acoplamientos()
     nombre = datos.normalizar_nombre(nombre)
     if nombre not in nombres:
-        raise ValueError(f"Neurona desconocida: {nombre}")
+        raise ValueError(f"Unknown neuron: {nombre}")
     return nombres.index(nombre)
 
 

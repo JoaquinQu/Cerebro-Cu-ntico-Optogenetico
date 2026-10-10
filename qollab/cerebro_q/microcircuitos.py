@@ -6,25 +6,25 @@ provoca la respuesta de escape del gusano (Nagel et al., 2005).
 
 MICROCIRCUITOS = {
     "toque-6": {
-        "nombre": "Toque suave · 6 neuronas",
+        "nombre": "Gentle touch · 6 neurons",
         "neuronas": ["AVM", "ALML", "AVDL", "AVAL", "PVCL", "PLML"],
         "fuente": "AVM",
-        "descripcion": "Receptores AVM, ALM y PLM con las interneuronas de mando AVD, AVA y PVC (lado izquierdo). "
-                       "6 qubits y 8 conexiones: el circuito recomendado para IonQ.",
+        "descripcion": "Touch receptors AVM, ALM and PLM with the command interneurons AVD, AVA and PVC (left side). "
+                       "6 qubits and 8 connections: the recommended circuit for IonQ.",
         "hardware": True,
     },
     "toque-7": {
-        "nombre": "Toque suave · 7 neuronas (con AVB)",
+        "nombre": "Gentle touch · 7 neurons (with AVB)",
         "neuronas": ["AVM", "ALML", "AVDL", "AVAL", "PVCL", "AVBL", "PLML"],
         "fuente": "AVM",
-        "descripcion": "Agrega AVB, la interneurona de avance: compiten retroceso y avance.",
+        "descripcion": "Adds AVB, the forward-motion interneuron: backward and forward compete.",
         "hardware": True,
     },
     "toque-bilateral-10": {
-        "nombre": "Toque bilateral · 10 neuronas",
+        "nombre": "Bilateral touch · 10 neurons",
         "neuronas": ["ALML", "AVM", "AVDL", "AVDR", "AVAL", "AVAR", "PVCL", "PVCR", "PLML", "PLMR"],
         "fuente": "AVM",
-        "descripcion": "Ambos lados del cuerpo (25 conexiones). En hardware conviene el modo Givens.",
+        "descripcion": "Both sides of the body (25 connections). On hardware, Givens mode is the better choice.",
         "hardware": False,
     },
 }

@@ -48,11 +48,11 @@ def circuito(qc, nombres: list[str], fold: int = 28) -> str:
 
 
 def etiqueta_estado(bits: str, nombres: list[str]) -> str:
-    """'0000000101' → 'AVM+AVDL' (qubit 0 = carácter de la derecha); sin excitación → '∅'."""
+    """'0000000101' → 'AVM+AVDL' (qubit 0 = carácter de la derecha); no excitation → '∅'."""
     bits = bits.replace(" ", "")
     unos = [nombres[q] for q, b in enumerate(reversed(bits)) if b == "1"]
     if not unos:
-        return "∅ (nadie)"
+        return "∅ (none)"
     return "+".join(unos) if len(unos) <= 3 else bits
 
 

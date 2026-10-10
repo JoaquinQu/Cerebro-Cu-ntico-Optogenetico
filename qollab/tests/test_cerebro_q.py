@@ -197,7 +197,7 @@ class TestFiguras(unittest.TestCase):
 
     def test_etiquetas_de_estado(self):
         from cerebro_q import visual
-        self.assertEqual(visual.etiqueta_estado("000", ["A", "B", "C"]), "∅ (nadie)")
+        self.assertEqual(visual.etiqueta_estado("000", ["A", "B", "C"]), "∅ (none)")
         self.assertEqual(visual.etiqueta_estado("101", ["A", "B", "C"]), "A+C")  # qubit 0 = derecha
 
 

@@ -16,7 +16,7 @@ export const respirar = () => new Promise((ok) => requestAnimationFrame(() => se
 
 async function llamar(nombre, ...args) {
   const fn = api[nombre];
-  if (!fn) throw new Error(`cerebro_q.api.${nombre} no existe`);
+  if (!fn) throw new Error(`cerebro_q.api.${nombre} does not exist`);
   return JSON.parse(texto(await fn.callPromising(...args)));
 }
 

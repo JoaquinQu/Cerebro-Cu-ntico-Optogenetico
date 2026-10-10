@@ -279,7 +279,7 @@ def figuras_json(params_json: str) -> str:
                                       float(p.get("gamma", 1.0)), int(p.get("pasos_trotter", 1)))
         expandida = p.get("vista") == "expandida"
         dibujo = qc.decompose(gates_to_decompose=["PauliEvolution"]) if expandida else qc
-        titulo = f"Paso de la cascada desde {nombres[0]} (τ = {tau:g})"
+        titulo = f"Cascade step from {nombres[0]} (τ = {tau:g})"
     else:
         nombres, J, fuentes, _ = _preparar(p)
         theta, t, gamma = float(p.get("theta", math.pi)), float(p.get("t", 30)), float(p.get("gamma", 1))
@@ -287,7 +287,7 @@ def figuras_json(params_json: str) -> str:
         pasos = max(int(p.get("pasos") or 2), 1)
         ops = circuitos.operaciones(len(nombres), fuentes, theta, _saltos(J, fuentes, theta, t, gamma, modo, pasos, orden))
         qc = dibujo = circuitos.a_qiskit(ops, len(nombres), nombre=f"t={t:g}")
-        titulo = f"Microcircuito ({modo}, t = {t:g})"
+        titulo = f"Microcircuit ({modo}, t = {t:g})"
     out = {
         "titulo": titulo,
         "neuronas": nombres,
@@ -296,10 +296,10 @@ def figuras_json(params_json: str) -> str:
         "circuito_svg": visual.circuito(dibujo, nombres),
     }
     if conteos:
-        out["histograma_svg"] = visual.histograma(conteos, nombres, "Conteos medidos en el backend")
+        out["histograma_svg"] = visual.histograma(conteos, nombres, "Counts measured on the backend")
         out["histograma_tipo"] = "medido"
     else:
-        out["histograma_svg"] = visual.distribucion_ideal(qc, nombres, "Distribución ideal (Statevector)")
+        out["histograma_svg"] = visual.distribucion_ideal(qc, nombres, "Ideal distribution (Statevector)")
         out["histograma_tipo"] = "ideal"
     return _json(out)
 
