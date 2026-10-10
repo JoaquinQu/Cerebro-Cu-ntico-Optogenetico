@@ -21,6 +21,8 @@ from collections import OrderedDict
 from contextlib import asynccontextmanager
 
 import numpy as np
+#Nuevo agregado
+from starlette.responses import JSONResponse, Response, FileResponse
 from pydantic import ValidationError
 from starlette.applications import Starlette
 from starlette.concurrency import run_in_threadpool
@@ -216,6 +218,7 @@ def create_app() -> Starlette:
         Route("/api/ionq/submit", ionq_submit, methods=["POST"]),
         Route("/api/ionq/jobs", ionq_jobs),
         Route("/api/ionq/jobs/{job_id}", ionq_job),
+        Route("/api/audio", lambda request: FileResponse("spikes_demo.wav", media_type="audio/wav")),
     ]
     if config.FRONTEND_DIR.exists():
         routes.append(Mount("/", StaticFiles(directory=str(config.FRONTEND_DIR), html=True), name="frontend"))
@@ -244,3 +247,5 @@ def _warm_up() -> None:
 
 
 app = create_app()
+
+

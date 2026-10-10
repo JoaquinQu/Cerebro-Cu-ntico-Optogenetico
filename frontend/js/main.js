@@ -62,6 +62,8 @@ async function fire(name = $("neuron-input").value.trim().toUpperCase()) {
   $("fire-btn").disabled = true;
   scene.setLabel(idx, `⚡ ${name}`);
   scene.fireLaser(idx, Math.sin(p.theta / 2) ** 2);
+  new Audio('/api/audio').play().catch(e => console.log("Audio bloqueado:", e));;
+
   try {
     const data = await api.walk({ source: name, theta: p.theta, gamma: p.gamma, t_max: p.t_max, frames: 160 });
     state.walk = data;
